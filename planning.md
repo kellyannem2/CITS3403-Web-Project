@@ -6,6 +6,7 @@ Planning
     - Discussed pros and cons of different ideas
     - analysed the project specs
     - idea chosen: Fit Tracker app
-    - Ahamed will work on the log-in page
-    - other members will work on HTML skeleton of the page 
+    - Ahamed will work on the log-in page and database
+    - other members will work on HTML skeleton of the page
+    - discussed further roles (who will focus on front design, javascript, backend etc)
 

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FitTrack Calorie Counter</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+   <!-- Shared Header -->
+   {% include 'header.html' %}
+ 
+   <!-- Main content for Exercise Log -->
+   <main>
+     <h2>Exercise Log</h2>
+     <button>+ Add Exercise Entry</button>
+     <table>
+       <thead>
+         <tr>
+           <th>Date</th>
+           <th>Exercise</th>
+           <th>Duration</th>
+           <th>Calories</th>
+         </tr>
+       </thead>
+       <tbody>
+         <tr>
+           <td>2025-04-12</td>
+           <td>Running</td>
+           <td>40 min</td>
+           <td>300</td>
+         </tr>
+         <tr>
+           <td>2025-04-12</td>
+           <td>Yoga</td>
+           <td>60 min</td>
+           <td>100</td>
+         </tr>
+       </tbody>
+     </table>
+     <button class="btn-link">View More</button>
+ 
+     <!-- Graph for Exercise Log -->
+     <h3>Weekly Calories Burned</h3>
+     <canvas id="exerciseChart" width="400" height="200"></canvas>
+   </main>
+ 
+   <!-- Load Chart.js from CDN -->
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <script>
+     const ctxExercise = document.getElementById('exerciseChart').getContext('2d');
+     const exerciseChart = new Chart(ctxExercise, {
+       type: 'bar', // You can change to 'line', 'pie', etc.
+       data: {
+         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+         datasets: [{
+           label: 'Calories Burned',
+           data: [300, 400, 350, 500, 450, 600, 400], // Sample values
+           backgroundColor: 'rgba(75, 192, 192, 0.2)',
+           borderColor: 'rgba(75, 192, 192, 1)',
+           borderWidth: 1
+         }]
+       },
+       options: {
+         scales: {
+           y: {
+             beginAtZero: true
+           }
+         }
+       }
+     });
+   </script>
+ 
+   <footer>
+     &copy; 2025 FitTrack. All rights reserved.
+   </footer>
+ 
+ </body>
+ </html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FitTrack Exercise Log</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+  <!-- Shared Header -->
+  {% include 'header.html' %}
+
+  <!-- Main content for Calorie Counter -->
+  <main>
+    <h2>Calorie Counter</h2>
+    <button>+ Add Meal Entry</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Meal</th>
+          <th>Calories</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2025-04-12</td>
+          <td>Breakfast</td>
+          <td>350</td>
+        </tr>
+        <tr>
+          <td>2025-04-12</td>
+          <td>Lunch</td>
+          <td>600</td>
+        </tr>
+        <tr>
+          <td>2025-04-12</td>
+          <td>Dinner</td>
+          <td>700</td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="btn-link">View More</button>
+
+    <!-- Graph for Calorie Counter -->
+    <h3>Weekly Calorie Intake</h3>
+    <canvas id="calorieChart" width="400" height="200"></canvas>
+  </main>
+
+  <!-- Load Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctxCalorie = document.getElementById('calorieChart').getContext('2d');
+    const calorieChart = new Chart(ctxCalorie, {
+      type: 'line', // You can change to 'bar', 'pie', etc.
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Calorie Intake',
+          data: [2100, 2000, 2200, 2300, 2100, 1900, 2000], // Sample values
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          fill: true,
+          tension: 0.1,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
+
+  <footer>
+    &copy; 2025 FitTrack. All rights reserved.
+  </footer>
+
+</body>
+</html>

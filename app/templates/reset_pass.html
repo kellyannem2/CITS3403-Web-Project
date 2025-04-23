@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="reset_password.css"> 
+</head>
+<body>
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div class="container">
+        <img src="warm_grey.jpg" alt="image" width="600" height="700" class="photo">
+        <div class="color-overlay"></div>
+        <div class="Login">
+            <h1>Forgot password</h1>
+        </div>
+        <div class="content">
+            
+        <div class="overlay">
+
+            <form method="POST" action="/reset_password/{{ token }}">
+                <input type="password" id="password" name="password" placeholder="New Password"><br><br>
+                <input type="password" id="password1" name="confirm_password"  placeholder="Confirm NewPassword"><br><br>
+                <input type="button" class="password_button" id="button" value="Show" onclick="myFunction()">
+                <script>
+                    function myFunction() {
+                    var x = document.getElementById("password");
+                    var y = document.getElementById("button");
+                    if (x.type === "password") {
+                        x.type = "text";
+                        y.value = "Hide";
+                        y.classList.remove('show');
+                        y.classList.add('hide');
+
+
+                    } else {
+                        x.type = "password";
+                        y.value = "Show";
+                        y.classList.remove('hide');
+                        y.classList.add('show');
+
+                    }
+                    }
+                    </script>
+                <input type="submit" value="Submit">
+            </form>
+            <p><a href="/login" class="link">Back to Login</a> </p>
+            <p><a href="/signup" class="link">Sign Up Instead</a> </p>
+        </div>
+    </div>
+</body>
+</html>

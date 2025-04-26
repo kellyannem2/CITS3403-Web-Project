@@ -41,7 +41,7 @@ def signup():
         username = request.form["username"]
         password = request.form["password"]
         confirm_password = request.form["confirm_password"]
-        name_user = request.form["name_user"]
+        full_name = request.form["name_user"]
 
         if password != confirm_password:
             flash("Passwords do not match.", "error")
@@ -57,7 +57,7 @@ def signup():
             verification_token = secrets.token_urlsafe(16)
             new_user = User(
                 email=email, username=username, password=hashed_password,
-                name_user=name_user, verification_token=verification_token
+                full_name=full_name, verification_token=verification_token
             )
             db.session.add(new_user)
             db.session.commit()
@@ -65,7 +65,7 @@ def signup():
             smiley_face = emoji.emojize("\U0001F642")
             verification_link = url_for("verify_email", token=verification_token, _external=True)
             msg = Message("Email Verification", sender="citsproject3403@gmail.com", recipients=[email])
-            msg.body = f"Dear {name_user}, \n\nPlease click the following link to verify your email: {verification_link} \n We welcome you to our website, {smiley_face} \n\n Thank you again, \n FitTracker Team"
+            msg.body = f"Dear {full_name}, \n\nPlease click the following link to verify your email: {verification_link} \n We welcome you to our website, {smiley_face} \n\n Thank you again, \n FitTracker Team"
             mail.send(msg)
 
             flash("Account created! Check your email.", "success")

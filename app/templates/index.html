@@ -7,7 +7,7 @@
 </head>
 <body>
 
-  <!-- ✅ Shared Header via Jinja include -->
+
   {% include 'header.html' %}
 
   <main>
@@ -19,21 +19,12 @@
           <h2 onclick="location.href='{{ url_for('leaderboard') }}'" style="cursor:pointer;">Leaderboard</h2>
         </div>
         <p class="subheading">weekly average</p>
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Calories</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>1</td><td>Emma</td><td>2,300</td></tr>
-            <tr><td>2</td><td>Lina</td><td>2,000</td></tr>
-            <tr><td>3</td><td>Olivia</td><td>2,000</td></tr>
-            <tr><td>4</td><td>Noah</td><td>1,900</td></tr>
-          </tbody>
-        </table>
+        <div id="scoreboard-section">
+          {% include 'partials/scoreboard.html' %}
+        </div>
+        
+        <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
+        
         <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
       </div>
 
@@ -52,12 +43,22 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>Running</td><td>40 min</td><td>300</td></tr>
-            <tr><td>Cycling</td><td>20 min</td><td>200</td></tr>
-            <tr><td>Yoga</td><td>60 min</td><td>100</td></tr>
+            {% for log in exercise_log%}
+            <tr>
+              <td>{{ log.exercise.name }}</td>
+              <td>{{ log.duration_minutes }} min</td>
+              <td>{{ log.calories_burned }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="3">No logs yet</td>
+            </tr>
+            {% endfor %}
           </tbody>
         </table>
-        <div class="total-summary"><span>Total: 1,650</span></div>
+        <div class="total-summary">
+        <span>Total: {{ user_total_calories_burnt }} cal</span>
+        </div>
         <h3>Weekly Calories Burned</h3>
         <canvas id="dashboardExerciseChart" width="400" height="200"></canvas>
         <a href="{{ url_for('exercise_log') }}" class="btn-link">View More</a>
@@ -77,9 +78,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>Breakfast</td><td>350</td></tr>
-            <tr><td>Lunch</td><td>600</td></tr>
-            <tr><td>Dinner</td><td>700</td></tr>
+              {% for log in meal_logs%}
+              <tr>
+                <td>{{ log.date }}</td>
+                <td>{{ log.meal.name }}</td>
+                <td>{{ log.meal.calories }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="3">No logs yet</td>
+              </tr>
+              {% endfor %}
           </tbody>
         </table>
         <div class="total-summary"><span>Total: 1,650</span></div>
@@ -131,5 +140,6 @@
   </script>
 
   <footer>&copy; 2025 FitTrack. All rights reserved.</footer>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

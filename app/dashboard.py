@@ -1,39 +1,17 @@
 from flask import render_template, session, redirect, url_for, flash
 from app import app, db
 from app.models import User, Scoreboard
-from datetime import datetime
+from datetime import datetime, date
 
-@app.route("/dashboard")
+@app.route("/dashboard" )
 def dashboard():
     if "user_id" in session:
         user = User.query.get(session["user_id"])
         if user:
-            score_board_exists = Scoreboard.query.filter_by(user_id=user.id, timestamp=datetime.utcnow().date()).first()
-            total_calories_burnt = sum(log.calories_burned for log in user.exercise_logs)
-            
-            scoreboard_entries = Scoreboard.query.order_by(Scoreboard.timestamp.desc()).all()
-            
-            if score_board_exists:
-                score_board_exists.total_calories_burned = total_calories_burnt
-
-            else:
-                new_entry_scoreboard = Scoreboard(user_id=user.id, total_calories_burned=total_calories_burnt)
-                db.session.add(new_entry_scoreboard)
-                
-            db.session.commit()
-                
-            user_scoreboard = Scoreboard.query.filter_by(user_id=user.id).first()
-
-            if user_scoreboard and user_scoreboard.team:
-                scoreboard_entries = Scoreboard.query.filter_by(team=user_scoreboard.team).order_by(Scoreboard.total_calories_burned.desc()).all()
-                
-            else:
-                scoreboard_entries = Scoreboard.query.filter_by(user_id=user.id).order_by(Scoreboard.timestamp.desc()).all()
 
 
             return render_template("index.html", user=user, exercise = user.exercises, meal = user.meals, 
-                                exercise_log = user.exercise_logs, meal_log = user.meal_logs, 
-                                scoreboard = scoreboard_entries, user_total_calories_burnt = total_calories_burnt)
+                                exercise_log = user.exercise_logs, meal_log = user.meal_logs)
         else:
             flash("User not found.", "error")
             session.pop("user_id", None)
@@ -56,5 +34,18 @@ def leaderboard():
 
 @app.route('/refresh_scoreboard')
 def refresh_scoreboard():
-    scoreboard_entries = Scoreboard.query.order_by(Scoreboard.total_calories_burned.desc()).all()
-    return render_template('partials/scoreboard.html', scoreboard=scoreboard_entries)
+    user_id = session.get("user_id")
+    if not user_id:
+        return "Not logged in", 401
+
+    user = User.query.get(user_id)
+
+    team_users = User.query.filter_by(team=user.team).all()
+    team_user_ids = [u.id for u in team_users]
+
+    team_member_scoreboard = Scoreboard.query.filter(
+        Scoreboard.user_id.in_(team_user_ids),
+        Scoreboard.timestamp == date.today()
+    ).order_by(Scoreboard.total_calories_burned.desc()).all()
+    
+    return render_template('partials/scoreboard.html', scoreboard=team_member_scoreboard)

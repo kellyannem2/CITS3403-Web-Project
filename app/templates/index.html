@@ -16,15 +16,12 @@
       <!-- Leaderboard Column -->
       <div class="column">
         <div class="column-header">
-          <h2 onclick="location.href='{{ url_for('leaderboard') }}'" style="cursor:pointer;">Leaderboard</h2>
+            <h2 onclick="location.href='{{ url_for('leaderboard') }}'" style="cursor:pointer;">Leaderboard</h2>
         </div>
-        <p class="subheading">weekly average</p>
-        <div id="scoreboard-section">
-          {% include 'partials/scoreboard.html' %}
-        </div>
-        
+        <p class="subheading">Today's scoreboard</p>
+        <div id="scoreboard-section"></div>
+    
         <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
-        
         <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
       </div>
 

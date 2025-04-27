@@ -7,15 +7,25 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
+
     <div class="container">
         <div class="content">
             <div class="Login">
                 <h1>FitTracker</h1>
                 <h1>Login</h1>
+
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
             </div>
 
             <div class="overlay">
-                <!-- Login Form -->
                 <form action="/login" method="POST">
                     <input type="text" id="username" name="username" placeholder="Username" required><br>
                     <input type="password" id="password" name="password" placeholder="Password" required><br>
@@ -44,5 +54,6 @@
             }
         }
     </script>
+
 </body>
 </html>

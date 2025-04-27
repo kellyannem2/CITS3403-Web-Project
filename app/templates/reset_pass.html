@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" type="text/css" href="reset_password.css"> 
+    <title>Reset Password - FitTracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
     <div class="container mt-4">
@@ -21,45 +21,40 @@
             {% endif %}
         {% endwith %}
     </div>
+
     <div class="container">
-        <img src="warm_grey.jpg" alt="image" width="600" height="700" class="photo">
-        <div class="color-overlay"></div>
-        <div class="Login">
-            <h1>Forgot password</h1>
-        </div>
         <div class="content">
-            
-        <div class="overlay">
+            <div class="Login">
+                <h1>Forgot Password</h1>
+            </div>
 
-            <form method="POST" action="/reset_password/{{ token }}">
-                <input type="password" id="password" name="password" placeholder="New Password"><br><br>
-                <input type="password" id="password1" name="confirm_password"  placeholder="Confirm NewPassword"><br><br>
-                <input type="button" class="password_button" id="button" value="Show" onclick="myFunction()">
-                <script>
-                    function myFunction() {
-                    var x = document.getElementById("password");
-                    var y = document.getElementById("button");
-                    if (x.type === "password") {
-                        x.type = "text";
-                        y.value = "Hide";
-                        y.classList.remove('show');
-                        y.classList.add('hide');
+            <div class="overlay">
+                <form method="POST" action="/reset_password/{{ token }}">
+                    <input type="password" id="password" name="password" placeholder="New Password" required><br>
+                    <input type="password" id="password1" name="confirm_password" placeholder="Confirm New Password" required><br>
 
+                    <input type="button" class="password_button" id="button" value="Show" onclick="togglePassword()">
+                    <input type="submit" value="Submit">
+                </form>
 
-                    } else {
-                        x.type = "password";
-                        y.value = "Show";
-                        y.classList.remove('hide');
-                        y.classList.add('show');
-
-                    }
-                    }
-                    </script>
-                <input type="submit" value="Submit">
-            </form>
-            <p><a href="/login" class="link">Back to Login</a> </p>
-            <p><a href="/signup" class="link">Sign Up Instead</a> </p>
+                <p><a href="/login" class="link">Back to Login</a></p>
+                <p><a href="/signup" class="link">Sign Up Instead</a></p>
+            </div>
         </div>
     </div>
+
+    <script>
+        function togglePassword() {
+            var x = document.getElementById("password");
+            var btn = document.getElementById("button");
+            if (x.type === "password") {
+                x.type = "text";
+                btn.value = "Hide";
+            } else {
+                x.type = "password";
+                btn.value = "Show";
+            }
+        }
+    </script>
 </body>
 </html>

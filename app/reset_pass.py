@@ -5,7 +5,7 @@ from app.models import User
 import secrets, emoji
 from werkzeug.security import check_password_hash, generate_password_hash
 
-@app.route("/reset_pass", methods=["GET","POST"])
+@app.route("/reset_pass", methods=["GET", "POST"])
 def reset_pass():
     if request.method == "POST":
         email = request.form["email"]
@@ -25,7 +25,8 @@ def reset_pass():
                     sender="citsproject3403@gmail.com",
                     recipients=[email],
                 )
-                msg.body = f"Dear {user.name_user}, \n\n Please click the following link to reset your password: {reset_link}, \n Please don't share this link with anyone. {worried_face} \n\n Thank you, \n FitTracker Team"
+                #Now properly reference first_name and last_name
+                msg.body = f"Dear {user.first_name} {user.last_name},\n\nPlease click the following link to reset your password:\n{reset_link}\n\nPlease don't share this link with anyone {worried_face}\n\nThank you,\nFitTracker Team"
                 mail.send(msg)
             except Exception as e:
                 print(f"Failed to send password reset email: {e}")
@@ -36,7 +37,6 @@ def reset_pass():
         return redirect(url_for("login"))
 
     return render_template("UsernamePassReset.html")
-
 
 @app.route("/reset_password/<token>", methods=["GET", "POST"])
 def reset_password_token(token):

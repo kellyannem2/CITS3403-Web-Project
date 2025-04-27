@@ -25,9 +25,9 @@ body, html {
     padding: 60px 50px;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    width: 50%; /* NEW: 50% of page width */
-    max-width: 600px; /* maximum 600px on big screens */
-    min-width: 400px; /* minimum 400px on smaller screens */
+    width: 50%;
+    max-width: 600px;
+    min-width: 400px;
     text-align: center;
 }
 
@@ -35,18 +35,12 @@ body, html {
     margin-bottom: 25px;
 }
 
-.Login h1:first-child {
-    font-size: 0.9rem;
-    font-weight: 400;
-    color: #6c757d;
-    margin-bottom: 8px;
-}
-
-.Login h1:last-child {
+.Login h1 {
     font-size: 2.4rem;
     font-weight: 700;
     color: #212529;
     margin-top: 0;
+    margin-bottom: 20px;
 }
 
 .overlay {
@@ -102,7 +96,10 @@ input[type="submit"]:hover, .password_button:hover {
 }
 
 .alert {
-    margin-bottom: 20px;
+    margin-top: 10px;
+    color: red; /* 👈 This will make the error messages RED */
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .alert-dismissible .close {

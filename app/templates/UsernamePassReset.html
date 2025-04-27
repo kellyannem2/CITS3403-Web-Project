@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" type="text/css" href="reset_password.css">
+    <title>Change Password - FitTracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
     <div class="container mt-4">
@@ -21,23 +21,21 @@
             {% endif %}
         {% endwith %}
     </div>
+
     <div class="container">
-        <img src="warm_grey.jpg" alt="image" width="600" height="700" class="photo">
-        <div class="color-overlay"></div>
-        <div class="Login">
-            <h1>Change password</h1>
-        </div>
         <div class="content">
-            
-        <div class="overlay">
+            <div class="Login">
+                <h1>Change Password</h1>
+            </div>
 
-            <form style="text-align:center" action="/reset_pass" method="POST">
-                <input type="text" id="email" name="email" 
-                placeholder="email">
+            <div class="overlay">
+                <form action="/reset_pass" method="POST">
+                    <input type="text" id="email" name="email" placeholder="Email" required><br>
+                    <input type="submit" value="Submit">
+                </form>
 
-                <input type="submit" value="Submit">
-            </form>
-            <p><a href="/login" class="link">back to login</a> </p>
+                <p><a href="/login" class="link">Back to Login</a></p>
+            </div>
         </div>
     </div>
 </body>

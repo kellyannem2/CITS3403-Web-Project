@@ -20,34 +20,32 @@ with app.app_context():
             full_name=fake.name(),
             email=fake.email(),
             password=generate_password_hash("password123"),
-            is_verified=True
+            is_verified=True,
+            team=random.choice(teams)   # Assign team here
         )
         db.session.add(user)
         users.append(user)
-    db.session.commit()
+
+    db.session.commit()  # Commit users first to get their IDs
 
     for user in users:
-        # Create random Exercises & Meals for each user
+        # Create random Exercises & Meals (3 custom + 3 global)
         exercises = []
         meals = []
 
         for _ in range(3):
+            # Custom Exercise & Meal
             ex = Exercise(name=fake.word().capitalize(), duration_minutes=random.randint(20, 60), user_id=user.id)
             meal = Meal(name=fake.word().capitalize(), calories=random.randint(300, 900), user_id=user.id)
+            # Global Exercise & Meal
             ex_null = Exercise(name=fake.word().capitalize(), duration_minutes=random.randint(20, 60), user_id=None)
             meal_null = Meal(name=fake.word().capitalize(), calories=random.randint(300, 900), user_id=None)
-            db.session.add(ex_null)
-            db.session.add(meal_null)
-            db.session.add(ex)
-            db.session.add(meal)
             
-            exercises.append(ex)
-            meals.append(meal)
-            exercises.append(ex_null)
-            meals.append(meal_null)
-            
+            db.session.add_all([ex, meal, ex_null, meal_null])
+            exercises.extend([ex, ex_null])
+            meals.extend([meal, meal_null])
 
-        db.session.commit()
+        db.session.commit()  # Commit exercises and meals to get IDs
 
         # Generate Exercise Logs
         for _ in range(5):
@@ -77,15 +75,20 @@ with app.app_context():
             )
             db.session.add(meal_log)
 
+        db.session.commit()  # Commit logs before calculating total calories
+
+        # Calculate total calories burned **for today only**
+        today_burned = db.session.query(
+            db.func.sum(ExerciseLog.calories_burned)
+        ).filter_by(user_id=user.id, date=date.today()).scalar() or 0
+
         # Create Scoreboard Entry
-        total_burned = sum(log.calories_burned for log in user.exercise_logs)
         scoreboard_entry = Scoreboard(
             user_id=user.id,
-            total_calories_burned=round(total_burned, 2),
-            timestamp=date.today(),
-            team=random.choice(teams)
+            total_calories_burned=round(today_burned, 2),
+            timestamp=date.today()
         )
         db.session.add(scoreboard_entry)
 
     db.session.commit()
-    print("Database successfully seeded with random dummy data!")
+    print("✅ Database successfully seeded with random dummy data!")

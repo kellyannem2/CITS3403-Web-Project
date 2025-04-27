@@ -8,6 +8,8 @@ class User(db.Model):
     full_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
+    team = db.Column(db.String(100), nullable=True)
+    
     reset_token = db.Column(db.String(100), nullable=True)
     verification_token = db.Column(db.String(100), nullable=True)
     is_verified = db.Column(db.Boolean, default=False)
@@ -22,7 +24,6 @@ class Scoreboard(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     total_calories_burned = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.Date, default=datetime.utcnow)
-    team = db.Column(db.String(100), nullable=True)
     user = db.relationship('User')
 
 class Exercise(db.Model):

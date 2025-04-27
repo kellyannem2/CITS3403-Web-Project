@@ -1,0 +1,20 @@
+<table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>User</th>
+        <th>Calories Burned</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in scoreboard %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ entry.user.full_name }}</td>
+        <td>{{ entry.total_calories_burned }}</td>
+        <td>{{ entry.timestamp }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>

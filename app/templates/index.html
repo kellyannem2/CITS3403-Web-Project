@@ -99,22 +99,30 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // Dashboard Exercise Log Chart
+    const chartData = {{ chart_data | tojson }};
+
     const ctxDashboardExercise = document.getElementById('dashboardExerciseChart').getContext('2d');
+
     new Chart(ctxDashboardExercise, {
       type: 'bar',
       data: {
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         datasets: [{
           label: 'Calories Burned',
-          data: [300, 400, 350, 500, 450, 600, 400],
+          data: chartData,
           backgroundColor: 'rgba(75, 192, 192, 0.2)',
           borderColor: 'rgba(75, 192, 192, 1)',
           borderWidth: 1
         }]
       },
-      options: { scales: { y: { beginAtZero: true } } }
+      options: {
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
     });
+</script>
+
 
     // Dashboard Calorie Counter Chart
     const ctxDashboardCalorie = document.getElementById('dashboardCalorieChart').getContext('2d');

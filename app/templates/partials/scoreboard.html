@@ -1,4 +1,5 @@
-<table>
+{% if scoreboard %}
+  <table>
     <thead>
       <tr>
         <th>#</th>
@@ -13,10 +14,9 @@
         <td>{{ entry.user.full_name }}</td>
         <td>{{ entry.total_calories_burned }}</td>
       </tr>
-      {% else %}
-      <tr>
-        <td colspan="3">No logs for Today</td>
-      </tr>
       {% endfor %}
     </tbody>
   </table>
+{% else %}
+  <p>No scoreboard data available for today.</p>
+{% endif %}

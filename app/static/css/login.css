@@ -1,4 +1,3 @@
-
 /* login.css */
 
 body, html {
@@ -26,8 +25,8 @@ body, html {
     padding: 60px 50px;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    width: 50%;
-    max-width: 600px;
+    width: 100%;
+    max-width: 500px;
     min-width: 400px;
     text-align: center;
 }
@@ -50,8 +49,20 @@ body, html {
     align-items: center;
 }
 
-input[type="text"], input[type="password"] {
+/* Forms inside overlay */
+form {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Input fields */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 90%;
+    max-width: 400px;
     padding: 16px;
     margin: 12px 0;
     border: 1px solid #ccc;
@@ -61,8 +72,11 @@ input[type="text"], input[type="password"] {
     box-sizing: border-box;
 }
 
-input[type="submit"], .password_button {
-    width: 100%;
+/* Submit and password toggle buttons */
+input[type="submit"],
+.password_button {
+    width: 90%;
+    max-width: 400px;
     padding: 16px;
     margin-top: 10px;
     background-color: #007bff;
@@ -71,11 +85,16 @@ input[type="submit"], .password_button {
     border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
+    text-align: center;
+    text-decoration: none;
     cursor: pointer;
     transition: background-color 0.3s;
+    display: block;
 }
 
-input[type="submit"]:hover, .password_button:hover {
+/* Hover effect for buttons */
+input[type="submit"]:hover,
+.password_button:hover {
     background-color: #0056b3;
 }
 
@@ -83,6 +102,7 @@ input[type="submit"]:hover, .password_button:hover {
     margin-bottom: 10px;
 }
 
+/* Link styling */
 .link {
     display: inline-block;
     margin-top: 12px;
@@ -96,9 +116,10 @@ input[type="submit"]:hover, .password_button:hover {
     text-decoration: underline;
 }
 
+/* Alert styling for error or success messages */
 .alert {
     margin-top: 10px;
-    color: red; /* 👈 This will make the error messages RED */
+    color: red;
     font-size: 14px;
     font-weight: 500;
 }

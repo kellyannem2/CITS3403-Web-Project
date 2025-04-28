@@ -1,6 +1,7 @@
 from datetime import datetime, date
 from app import db
 
+
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
@@ -9,11 +10,12 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     team = db.Column(db.String(100), nullable=True)
-    
+
     reset_token = db.Column(db.String(100), nullable=True)
     verification_token = db.Column(db.String(100), nullable=True)
     is_verified = db.Column(db.Boolean, default=False)
 
+    # Relationships
     exercises = db.relationship('Exercise', backref='user', lazy=True)
     meals = db.relationship('Meal', backref='user', lazy=True)
     exercise_logs = db.relationship('ExerciseLog', backref='user', lazy=True)
@@ -23,7 +25,7 @@ class Scoreboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     total_calories_burned = db.Column(db.Float, nullable=False)
-    timestamp = db.Column(db.Date, default=datetime.utcnow)
+    timestamp = db.Column(db.Date, default=date.today)
     user = db.relationship('User')
 
 class Exercise(db.Model):
@@ -38,7 +40,7 @@ class ExerciseLog(db.Model):
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.id'), nullable=False)
     duration_minutes = db.Column(db.Float, nullable=False)
     calories_burned = db.Column(db.Float, nullable=False)
-    date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    date = db.Column(db.Date, nullable=False, default=date.today)
 
     exercise = db.relationship('Exercise')
 
@@ -52,5 +54,6 @@ class MealLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     meal_id = db.Column(db.Integer, db.ForeignKey('meal.id'), nullable=False)
-    date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    date = db.Column(db.Date, default=date.today)
+
     meal = db.relationship('Meal')

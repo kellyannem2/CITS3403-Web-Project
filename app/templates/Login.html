@@ -1,63 +1,60 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login - FitTracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-    <div class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
 
     <div class="container">
-        <img src="warm_grey.jpg" alt="image" width="600" height="700" class="photo">
-        <div class="color-overlay"></div>
-        <div class="Login">
-            <h1>Login</h1>
-        </div>
         <div class="content">
-            
-        <div class="overlay">
+            <div class="Login">
+                <h1>FitTracker</h1>
+                <h1>Login</h1>
 
-            <form action="/login" method = "POST">
-                <input type="text" id="username" name="username" 
-                placeholder="Username" required><br>
-                <input type="password" id="password" name="password"
-                placeholder="Password" required><br><br>
-                <input type="button" class="password_button" id="button" value="Show" onclick="myFunction()">
-                <script>
-                    function myFunction() {
-                        var x = document.getElementById("password");
-                        var btn = document.getElementById("button");
-                        if (x.type === "password") {
-                            x.type = "text";
-                            btn.value = "Hide";
-                        } else {
-                            x.type = "password";
-                            btn.value = "Show";
-    }
-}
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
 
-                    </script>
+            <div class="overlay">
+                <form action="/login" method="POST">
+                    <input type="text" id="username" name="username" placeholder="Username" required><br>
+                    <input type="password" id="password" name="password" placeholder="Password" required><br>
 
-                <input type="submit" value="Submit">
-            </form>
-            <p><a href="reset_pass" class="link">Reset Password</a> </p>
-            <p><a href="/signup" class="link">Sign Up</a> </p>
+                    <input type="button" class="password_button" id="button" value="Show" onclick="togglePassword()">
+                    <input type="submit" value="Submit">
+                </form>
+
+                <p><a href="/reset_pass" class="link">Reset Password</a></p>
+                <p><a href="/signup" class="link">Sign Up</a></p>
+            </div>
         </div>
     </div>
+
+    <!-- JavaScript to toggle password visibility -->
+    <script>
+        function togglePassword() {
+            var x = document.getElementById("password");
+            var btn = document.getElementById("button");
+            if (x.type === "password") {
+                x.type = "text";
+                btn.value = "Hide";
+            } else {
+                x.type = "password";
+                btn.value = "Show";
+            }
+        }
+    </script>
+
 </body>
 </html>

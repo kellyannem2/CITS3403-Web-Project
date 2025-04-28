@@ -1,0 +1,22 @@
+<table>
+    <thead>
+        <tr>
+        <th>Exercise</th>
+        <th>Duration</th>
+        <th>Calories</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for log in exercise_log%}
+    <tr>
+        <td>{{ log.exercise.name }}</td>
+        <td>{{ log.duration_minutes }} min</td>
+        <td>{{ log.calories_burned }}</td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="3">No logs yet</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>

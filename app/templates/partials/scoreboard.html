@@ -4,7 +4,6 @@
         <th>#</th>
         <th>User</th>
         <th>Calories Burned</th>
-        <th>Date</th>
       </tr>
     </thead>
     <tbody>
@@ -13,7 +12,10 @@
         <td>{{ loop.index }}</td>
         <td>{{ entry.user.full_name }}</td>
         <td>{{ entry.total_calories_burned }}</td>
-        <td>{{ entry.timestamp }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="3">No logs for Today</td>
       </tr>
       {% endfor %}
     </tbody>

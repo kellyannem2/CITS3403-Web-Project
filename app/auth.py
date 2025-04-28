@@ -1,5 +1,5 @@
 from app import app
-from app import db , mail
+from app import db, mail
 from flask_mail import Message
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import render_template, request, redirect, url_for, session, flash
@@ -8,9 +8,9 @@ from app.models import User
 
 @app.route("/")
 def root():
-    return redirect(url_for("login"))
+    return render_template("pre_login.html")
 
-@app.route("/login", methods=["GET","POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
@@ -33,8 +33,7 @@ def login():
 
     return render_template("Login.html")
 
-
-@app.route("/signup", methods=["GET","POST"])
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
         email = request.form["email"]
@@ -62,10 +61,10 @@ def signup():
             db.session.add(new_user)
             db.session.commit()
 
-            smiley_face = emoji.emojize("\U0001F642")
+            smiley_face = emoji.emojize(":slightly_smiling_face:")
             verification_link = url_for("verify_email", token=verification_token, _external=True)
             msg = Message("Email Verification", sender="citsproject3403@gmail.com", recipients=[email])
-            msg.body = f"Dear {full_name}, \n\nPlease click the following link to verify your email: {verification_link} \n We welcome you to our website, {smiley_face} \n\n Thank you again, \n FitTracker Team"
+            msg.body = f"Dear {full_name}, \n\nPlease click the following link to verify your email: {verification_link} \nWe welcome you to our website, {smiley_face} \n\nThank you again, \nFitTracker Team"
             mail.send(msg)
 
             flash("Account created! Check your email.", "success")
@@ -77,7 +76,6 @@ def signup():
             return redirect(url_for("signup"))
 
     return render_template("signup.html")
-
 
 @app.route("/verify_email/<token>")
 def verify_email(token):

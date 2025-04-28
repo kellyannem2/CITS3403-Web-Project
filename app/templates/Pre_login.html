@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - FitTracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <div class="content">
+            <div class="Login">
+                <h1>Welcome to FitTracker</h1>
+            </div>
+            <div class="overlay">
+                <a href="{{ url_for('login') }}" class="password_button">Login</a>
+                <a href="{{ url_for('signup') }}" class="password_button">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

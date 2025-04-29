@@ -1,4 +1,6 @@
-// Exercise Log Modal (on exercise log page not on dashboard)
+// Exercise Log Modal 
+// Adding exercises in dynamically from the Exercises Page
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log("Script is loaded");
   

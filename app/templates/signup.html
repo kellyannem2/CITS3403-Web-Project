@@ -1,61 +1,283 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - FitTracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-</head>
-<body>
-    <div class="container">
-        <div class="content">
-            <div class="Login">
-                <h1>Sign Up</h1>
+{% extends "baselogin.html" %}
 
-                {% with messages = get_flashed_messages(with_categories=True) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            </div>
+{% block title %}Sign Up{% endblock %}
 
-            <div class="overlay">
-                <form action="/signup" method="POST">
-                    <input type="text" id="email" name="email" placeholder="Email address" required><br>
-                    <input type="text" id="first_name" name="first_name" placeholder="First Name" required><br>
-                    <input type="text" id="last_name" name="last_name" placeholder="Last Name" required><br>
-                    <input type="text" id="username" name="username" placeholder="Username" required><br>
-                    <input type="password" id="password" name="password" placeholder="Password" required><br>
-                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required><br>
+{% block content %}
+<div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
 
-                    <input type="button" class="password_button" id="button" value="Show" onclick="togglePassword()">
-                    <input type="submit" value="Submit">
-                </form>
+<h1 class="login__title">Sign Up</h1>
+<form action="{{ url_for('signup') }}" method="POST">
 
-                <p><a href="/login" class="link">Back to Login</a></p>
-            </div>
+    <!-- NAME -->
+    <div class="field-row">
+        <div class="login__box" style="flex: 1; position: relative;">
+            <i class="bx bx-user" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%);"></i>
+            <input type="text" id="name_user" name="name_user" class="login__input" placeholder="Your Name" required style="padding-left: 40px;">
+        </div>
+        <div class="tick-wrapper">
+            <i id="nameCheck" class="bx" style="display: none; font-size: 1.5rem;"></i>
         </div>
     </div>
 
-    <script>
-        function togglePassword() {
-            var passwordField = document.getElementById("password");
-            var confirmPasswordField = document.getElementById("confirm_password");
-            var btn = document.getElementById("button");
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                confirmPasswordField.type = "text";
-                btn.value = "Hide";
-            } else {
-                passwordField.type = "password";
-                confirmPasswordField.type = "password";
-                btn.value = "Show";
-            }
-        }
-    </script>
-</body>
-</html>
+    <!-- USERNAME -->
+    <div class="field-row" style="margin-top: 1rem;">
+        <div class="login__box" style="flex: 1; position: relative;">
+            <i class="bx bx-user" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%);"></i>
+            <input type="text" id="username" name="username" class="login__input" placeholder="Username" required style="padding-left: 40px;">
+        </div>
+        <div class="tick-wrapper">
+            <i id="usernameCheck" class="bx" style="display: none; font-size: 1.5rem;"></i>
+        </div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="field-row" style="margin-top: 1rem;">
+        <div class="login__box" style="flex: 1; position: relative;">
+            <i class="bx bx-envelope" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%);"></i>
+            <input type="email" id="email" name="email" class="login__input" placeholder="Email Address" required style="padding-left: 40px;">
+        </div>
+        <div class="tick-wrapper">
+            <i id="emailCheck" class="bx" style="display: none; font-size: 1.5rem;"></i>
+        </div>
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="field-row" style="margin-top: 1rem;">
+        <div class="login__box" style="flex: 1; position: relative;">
+            <i class="bx bx-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%);"></i>
+            <input type="password" id="password" name="password" class="login__input" placeholder="Password" required style="padding-left: 40px; padding-right: 40px;">
+            <i class="bx bx-show" id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+        </div>
+        <div class="tick-wrapper">
+            <i id="passwordCheck" class="bx" style="display: none; font-size: 1.5rem;"></i>
+        </div>
+    </div>
+
+    <!-- PASSWORD REQUIREMENTS -->
+    <ul id="passwordRequirements" style="list-style: none; padding-left: 1rem; margin-top: 10px; display: none;">
+        <li id="length" class="requirement">
+            <span class="requirement-text">At least 8 characters</span>
+            <i class="bx" id="lengthIcon"></i>
+        </li>
+        <li id="uppercase" class="requirement">
+            <span class="requirement-text">At least one uppercase letter</span>
+            <i class="bx" id="uppercaseIcon"></i>
+        </li>
+        <li id="lowercase" class="requirement">
+            <span class="requirement-text">At least one lowercase letter</span>
+            <i class="bx" id="lowercaseIcon"></i>
+        </li>
+        <li id="number" class="requirement">
+            <span class="requirement-text">At least one number</span>
+            <i class="bx" id="numberIcon"></i>
+        </li>
+        <li id="special" class="requirement">
+            <span class="requirement-text">At least one special character (!@#$%^&*)</span>
+            <i class="bx" id="specialIcon"></i>
+        </li>
+    </ul>
+
+    <!-- CONFIRM PASSWORD -->
+    <div class="field-row" style="margin-top: 1rem;">
+        <div class="login__box" style="flex: 1; position: relative;">
+            <i class="bx bx-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%);"></i>
+            <input type="password" id="confirm_password" name="confirm_password" class="login__input" placeholder="Confirm Password" required style="padding-left: 40px;">
+        </div>
+        <div class="tick-wrapper">
+            <i id="confirmCheck" class="bx" style="display: none; font-size: 1.5rem;"></i>
+        </div>
+    </div>
+
+    <button type="submit" class="login__button" style="margin-top: 1.5rem;">Sign Up</button>
+</form>
+
+<p class="login__register">
+    Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+</p>
+
+<!-- JavaScript -->
+<script>
+    const nameInput = document.getElementById('name_user');
+const usernameInput = document.getElementById('username');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const confirmInput = document.getElementById('confirm_password');
+const togglePassword = document.getElementById('togglePassword');
+
+const nameCheck = document.getElementById('nameCheck');
+const usernameCheck = document.getElementById('usernameCheck');
+const emailCheck = document.getElementById('emailCheck');
+const passwordCheck = document.getElementById('passwordCheck');
+const confirmCheck = document.getElementById('confirmCheck');
+
+const lengthIcon = document.getElementById('lengthIcon');
+const uppercaseIcon = document.getElementById('uppercaseIcon');
+const lowercaseIcon = document.getElementById('lowercaseIcon');
+const numberIcon = document.getElementById('numberIcon');
+const specialIcon = document.getElementById('specialIcon');
+
+// Validate Name
+nameInput.addEventListener('input', function () {
+    const nameValue = nameInput.value.trim();
+    const parts = nameValue.split(/\s+/);
+    if (parts.length >= 2 && parts.every(p => /^[A-Za-z]+$/.test(p))) {
+        nameCheck.className = 'bx bx-check-circle';
+        nameCheck.style.color = '#16c06b';
+        nameCheck.style.display = 'inline';
+    } else {
+        nameCheck.className = 'bx bx-x-circle';
+        nameCheck.style.color = '#ff4c4c';
+        nameCheck.style.display = 'inline';
+    }
+});
+
+// Validate Username
+usernameInput.addEventListener('input', function () {
+    const usernameValue = usernameInput.value.trim();
+    if (usernameValue.length >= 4) {
+        usernameCheck.className = 'bx bx-check-circle';
+        usernameCheck.style.color = '#16c06b';
+        usernameCheck.style.display = 'inline';
+    } else {
+        usernameCheck.className = 'bx bx-x-circle';
+        usernameCheck.style.color = '#ff4c4c';
+        usernameCheck.style.display = 'inline';
+    }
+});
+
+// Validate Email
+emailInput.addEventListener('input', function () {
+    const emailValue = emailInput.value.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailPattern.test(emailValue)) {
+        emailCheck.className = 'bx bx-check-circle';
+        emailCheck.style.color = '#16c06b';
+        emailCheck.style.display = 'inline';
+    } else {
+        emailCheck.className = 'bx bx-x-circle';
+        emailCheck.style.color = '#ff4c4c';
+        emailCheck.style.display = 'inline';
+    }
+});
+
+// Validate Password Strength
+function checkPasswordStrength() {
+    const password = passwordInput.value;
+
+    // Always show the password requirements list while typing
+    document.getElementById('passwordRequirements').style.display = 'block';
+
+    // Check each requirement individually and update icon only
+    if (password.length >= 8) {
+        lengthIcon.className = 'bx bx-check-circle';
+        lengthIcon.style.color = '#16c06b';
+    } else {
+        lengthIcon.className = 'bx bx-x-circle';
+        lengthIcon.style.color = '#ff4c4c';
+    }
+
+    if (/[A-Z]/.test(password)) {
+        uppercaseIcon.className = 'bx bx-check-circle';
+        uppercaseIcon.style.color = '#16c06b';
+    } else {
+        uppercaseIcon.className = 'bx bx-x-circle';
+        uppercaseIcon.style.color = '#ff4c4c';
+    }
+
+    if (/[a-z]/.test(password)) {
+        lowercaseIcon.className = 'bx bx-check-circle';
+        lowercaseIcon.style.color = '#16c06b';
+    } else {
+        lowercaseIcon.className = 'bx bx-x-circle';
+        lowercaseIcon.style.color = '#ff4c4c';
+    }
+
+    if (/\d/.test(password)) {
+        numberIcon.className = 'bx bx-check-circle';
+        numberIcon.style.color = '#16c06b';
+    } else {
+        numberIcon.className = 'bx bx-x-circle';
+        numberIcon.style.color = '#ff4c4c';
+    }
+
+    if (/[!@#$%^&*]/.test(password)) {
+        specialIcon.className = 'bx bx-check-circle';
+        specialIcon.style.color = '#16c06b';
+    } else {
+        specialIcon.className = 'bx bx-x-circle';
+        specialIcon.style.color = '#ff4c4c';
+    }
+
+    // Check if all requirements are satisfied
+    const isStrong = password.length >= 8 &&
+                     /[A-Z]/.test(password) &&
+                     /[a-z]/.test(password) &&
+                     /\d/.test(password) &&
+                     /[!@#$%^&*]/.test(password);
+
+    if (isStrong) {
+        passwordCheck.className = 'bx bx-check-circle';
+        passwordCheck.style.color = '#16c06b';
+        passwordCheck.style.display = 'inline';
+        document.getElementById('passwordRequirements').style.display = 'none';
+    } else {
+        passwordCheck.className = 'bx bx-x-circle';
+        passwordCheck.style.color = '#ff4c4c';
+        passwordCheck.style.display = 'inline';
+        document.getElementById('passwordRequirements').style.display = 'block';
+    }
+
+    checkPasswordMatch();
+}
+
+// Confirm Password Match
+function checkPasswordMatch() {
+    const password = passwordInput.value;
+    const confirmPassword = confirmInput.value;
+
+    if (password && confirmPassword && password === confirmPassword) {
+        confirmCheck.className = 'bx bx-check-circle';
+        confirmCheck.style.color = '#16c06b';
+        confirmCheck.style.display = 'inline';
+    } else {
+        confirmCheck.className = 'bx bx-x-circle';
+        confirmCheck.style.color = '#ff4c4c';
+        confirmCheck.style.display = 'inline';
+    }
+}
+
+// Event listeners
+passwordInput.addEventListener('input', checkPasswordStrength);
+confirmInput.addEventListener('input', checkPasswordMatch);
+
+// Toggle Show/Hide Password
+togglePassword.addEventListener('click', function () {
+    const showing = passwordInput.getAttribute('type') === 'text';
+
+    if (showing) {
+        passwordInput.setAttribute('type', 'password');
+        confirmInput.setAttribute('type', 'password');
+        this.classList.remove('bx-hide');
+        this.classList.add('bx-show');
+    } else {
+        passwordInput.setAttribute('type', 'text');
+        confirmInput.setAttribute('type', 'text');
+        this.classList.remove('bx-show');
+        this.classList.add('bx-hide');
+    }
+});
+</script>
+{% endblock %}

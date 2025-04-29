@@ -13,7 +13,35 @@
    <!-- Main content for Exercise Log -->
    <main>
      <h2>Exercise Log</h2>
-     <button>+ Add Exercise Entry</button>
+
+      <!-- start -->
+
+      <button id="openLogModalBtn" class="button">+ Add Exercise Entry</button>
+         <!-- The Modal -->
+    <div id="logModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeLogModal">&times;</span>
+        <h2>Add Exercise</h2>
+        <form>
+          <label>Date:</label><br />
+          <input type="date" required><br /><br />
+    
+          <label>Exercise:</label><br />
+          <input type="text" placeholder="e.g. Running"><br /><br />
+    
+          <label>Duration:</label><br />
+          <input type="text" placeholder="e.g. 30 min"><br /><br />
+    
+          <label>Calories:</label><br />
+          <input type="text" placeholder="e.g. 300"><br /><br />
+    
+          <button type="submit">Add</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- end my code -->
+
      <table>
        <thead>
          <tr>
@@ -74,6 +102,8 @@
    <footer>
      &copy; 2025 FitTrack. All rights reserved.
    </footer>
+
+   <script src="/static/JS/exercise_log.js"></script>
  
  </body>
  </html>

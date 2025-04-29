@@ -14,7 +14,7 @@ with app.app_context():
     teams = ["Red Dragons", "Blue Sharks", "Green Giants", "Yellow Tigers"]
 
     users = []
-    for _ in range(5):   # Create 5 random users
+    for _ in range(10):   # Create 5 random users
         user = User(
             username=fake.user_name(),
             full_name=fake.name(),
@@ -33,7 +33,7 @@ with app.app_context():
         exercises = []
         meals = []
 
-        for _ in range(3):
+        for _ in range(5):
             # Custom Exercise & Meal
             ex = Exercise(name=fake.word().capitalize(), duration_minutes=random.randint(20, 60), user_id=user.id)
             meal = Meal(name=fake.word().capitalize(), calories=random.randint(300, 900), user_id=user.id)
@@ -48,7 +48,7 @@ with app.app_context():
         db.session.commit()  # Commit exercises and meals to get IDs
 
         # Generate Exercise Logs
-        for _ in range(5):
+        for _ in range(10):
             chosen_ex = random.choice(exercises)
             duration = random.randint(15, 90)
             calories_burned = round(duration * random.uniform(5, 12), 2)
@@ -64,7 +64,7 @@ with app.app_context():
             db.session.add(ex_log)
 
         # Generate Meal Logs
-        for _ in range(5):
+        for _ in range(10):
             chosen_meal = random.choice(meals)
             log_date = date.today() - timedelta(days=random.randint(0, 7))
 

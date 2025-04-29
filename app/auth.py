@@ -41,7 +41,7 @@ def signup():
         username = request.form["username"]
         password = request.form["password"]
         confirm_password = request.form["confirm_password"]
-        full_name = request.form.get("name_user", "").strip()
+        full_name = request.form["firstNameInput"] + " " + request.form["lastNameInput"]
 
         if password != confirm_password:
             flash("Passwords do not match.", "error")

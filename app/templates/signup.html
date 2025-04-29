@@ -21,16 +21,28 @@
 <h1 class="login__title">Sign Up</h1>
 <form action="{{ url_for('signup') }}" method="POST">
 
-    <!-- NAME -->
+    <!-- FIRST NAME -->
     <div class="field-row">
         <div class="login__box" style="flex: 1; position: relative;">
             <i class="bx bx-user" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%);"></i>
-            <input type="text" id="name_user" name="name_user" class="login__input" placeholder="Your Name" required style="padding-left: 40px;">
+            <input type="text" id="firstNameInput" name="firstNameInput" class="login__input" placeholder="First Name" required style="padding-left: 40px;">
         </div>
         <div class="tick-wrapper">
             <i id="nameCheck" class="bx" style="display: none; font-size: 1.5rem;"></i>
         </div>
     </div>
+
+    <!-- LAST NAME -->
+    <div class="field-row">
+        <div class="login__box" style="flex: 1; position: relative;">
+            <i class="bx bx-user" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%);"></i>
+            <input type="text" id="lastNameInput" name="lastNameInput" class="login__input" placeholder="Last Name" required style="padding-left: 40px;">
+        </div>
+        <div class="tick-wrapper">
+            <i id="nameCheck" class="bx" style="display: none; font-size: 1.5rem;"></i>
+        </div>
+    </div>
+
 
     <!-- USERNAME -->
     <div class="field-row" style="margin-top: 1rem;">
@@ -110,7 +122,7 @@
 
 <!-- JavaScript -->
 <script>
-    const nameInput = document.getElementById('name_user');
+
 const usernameInput = document.getElementById('username');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
@@ -129,20 +141,7 @@ const lowercaseIcon = document.getElementById('lowercaseIcon');
 const numberIcon = document.getElementById('numberIcon');
 const specialIcon = document.getElementById('specialIcon');
 
-// Validate Name
-nameInput.addEventListener('input', function () {
-    const nameValue = nameInput.value.trim();
-    const parts = nameValue.split(/\s+/);
-    if (parts.length >= 2 && parts.every(p => /^[A-Za-z]+$/.test(p))) {
-        nameCheck.className = 'bx bx-check-circle';
-        nameCheck.style.color = '#16c06b';
-        nameCheck.style.display = 'inline';
-    } else {
-        nameCheck.className = 'bx bx-x-circle';
-        nameCheck.style.color = '#ff4c4c';
-        nameCheck.style.display = 'inline';
-    }
-});
+
 
 // Validate Username
 usernameInput.addEventListener('input', function () {

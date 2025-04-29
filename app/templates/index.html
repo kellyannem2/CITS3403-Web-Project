@@ -27,14 +27,18 @@
 
       <!-- Exercise Log Column -->
       <div class="column">
+
+        {% include 'partials/add_exercise_form.html' %}
+
+      <br> <hr> <br>
+
         <div class="column-header">
           <h2 onclick="location.href='{{ url_for('exercise_log') }}'" style="cursor:pointer;">Exercise Log</h2>
          <!-- <button class="add-btn" title="Add an Exercise">+</button> -->
 
-        <!-- Start -->
-        <!-- Trigger Button -->
-        <button id="openModalBtn" class="add-btn" title="Add an Exercise">+</button>
 
+<!-- Trigger Button -->
+      <button id="openModalBtn" class="add-btn" title="Add an Exercise">+</button>
         <!-- The Modal -->
         <div id="modal" class="modal">
           <div class="modal-content">
@@ -52,7 +56,7 @@
           </div>
         </div>
 
-        <!-- End-->
+        <!-- End Modal -->
 
         </div>
         <table>

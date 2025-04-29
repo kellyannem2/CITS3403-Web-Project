@@ -1,60 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - FitTracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-</head>
-<body>
-    <div class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+{% extends "baselogin.html" %}
+
+{% block title %}Reset Password{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<h1 class="login__title">Forgot Password</h1>
+<form method="POST" action="{{ url_for('reset_password_token', token=token) }}">
+    <div class="login__box">
+        <input type="password" id="password" name="password" class="login__input" placeholder="New Password" required>
     </div>
-
-    <div class="container">
-        <div class="content">
-            <div class="Login">
-                <h1>Forgot Password</h1>
-            </div>
-
-            <div class="overlay">
-                <form method="POST" action="/reset_password/{{ token }}">
-                    <input type="password" id="password" name="password" placeholder="New Password" required><br>
-                    <input type="password" id="password1" name="confirm_password" placeholder="Confirm New Password" required><br>
-
-                    <input type="button" class="password_button" id="button" value="Show" onclick="togglePassword()">
-                    <input type="submit" value="Submit">
-                </form>
-
-                <p><a href="/login" class="link">Back to Login</a></p>
-                <p><a href="/signup" class="link">Sign Up Instead</a></p>
-            </div>
-        </div>
+    <div class="login__box">
+        <input type="password" id="confirm_password" name="confirm_password" class="login__input" placeholder="Confirm New Password" required>
     </div>
+    <input type="button" class="password_button" id="button" value="Show" onclick="togglePassword()">
+    <button type="submit" class="login__button">Submit</button>
+</form>
+<p class="login__register">
+    <a href="{{ url_for('login') }}">Back to Login</a>
+</p>
+<p class="login__register">
+    <a href="{{ url_for('signup') }}">Sign Up Instead</a>
+</p>
 
-    <script>
-        function togglePassword() {
-            var x = document.getElementById("password");
-            var btn = document.getElementById("button");
-            if (x.type === "password") {
-                x.type = "text";
-                btn.value = "Hide";
-            } else {
-                x.type = "password";
-                btn.value = "Show";
-            }
+<script>
+    function togglePassword() {
+        const passwordField = document.getElementById("password");
+        const confirmPasswordField = document.getElementById("confirm_password");
+        const toggleButton = document.getElementById("button");
+
+        if (passwordField.type === "password" && confirmPasswordField.type === "password") {
+            passwordField.type = "text";
+            confirmPasswordField.type = "text";
+            toggleButton.value = "Hide";
+        } else {
+            passwordField.type = "password";
+            confirmPasswordField.type = "password";
+            toggleButton.value = "Show";
         }
-    </script>
-</body>
-</html>
+    }
+</script>
+{% endblock %}

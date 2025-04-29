@@ -10,10 +10,15 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     team = db.Column(db.String(100), nullable=True)
+    profile_img = db.Column(db.String(255), nullable=True) 
+
 
     reset_token = db.Column(db.String(100), nullable=True)
     verification_token = db.Column(db.String(100), nullable=True)
     is_verified = db.Column(db.Boolean, default=False)
+
+    email_change_token = db.Column(db.String(64), nullable=True)
+    new_email_temp = db.Column(db.String(120), nullable=True)
 
     # Relationships
     exercises = db.relationship('Exercise', backref='user', lazy=True)

@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
+from flask_migrate import Migrate
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -25,6 +26,7 @@ from app import auth , reset_pass , dashboard
 
 from app.models import User #add any other required tables here and the following line would automatically create them
 
+migrate = Migrate(app, db)
 
 with app.app_context():
     db.create_all()

@@ -1,42 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Change Password - FitTracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-</head>
-<body>
-    <div class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+{% extends "baselogin.html" %}
+
+{% block title %}Reset Username/Password{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<h1 class="login__title">Reset Username or Password</h1>
+<form action="{{ url_for('reset_pass') }}" method="POST">
+    <div class="login__box">
+        <input type="email" id="email" name="email" class="login__input" placeholder="Email Address" required>
     </div>
-
-    <div class="container">
-        <div class="content">
-            <div class="Login">
-                <h1>Change Password</h1>
-            </div>
-
-            <div class="overlay">
-                <form action="/reset_pass" method="POST">
-                    <input type="text" id="email" name="email" placeholder="Email" required><br>
-                    <input type="submit" value="Submit">
-                </form>
-
-                <p><a href="/login" class="link">Back to Login</a></p>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+    <button type="submit" class="login__button">Submit</button>
+</form>
+<p class="login__register">
+    <a href="{{ url_for('login') }}">Back to Login</a>
+</p>
+{% endblock %}

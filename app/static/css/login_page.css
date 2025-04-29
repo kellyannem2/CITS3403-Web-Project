@@ -1,0 +1,298 @@
+/*=============== GOOGLE FONTS ===============*/
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+
+/*=============== VARIABLES CSS ===============*/
+:root {
+  --white-color: hsl(0, 0%, 100%);
+  --black-color: hsl(0, 0%, 0%);
+  --body-font: "Poppins", sans-serif;
+  --h1-font-size: 2rem;
+  --normal-font-size: 1rem;
+  --small-font-size: 0.813rem;
+}
+
+/*=============== BASE ===============*/
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body,
+input,
+button {
+  font-family: var(--body-font);
+  font-size: var(--normal-font-size);
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/*=============== LOGIN ===============*/
+.login {
+  position: relative;
+  height: 100vh;
+  display: grid;
+  align-items: center;
+}
+
+.login__bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.login__form {
+  position: relative;
+  margin-inline: 1.5rem;
+  background-color: hsla(0, 0%, 100%, 0.01);
+  border: 2px solid hsla(0, 0%, 100%, 0.7);
+  padding: 2.5rem 1rem;
+  color: var(--white-color);
+  border-radius: 1rem;
+  backdrop-filter: blur(16px);
+}
+
+.login__title {
+  text-align: center;
+  font-size: var(--h1-font-size);
+  margin-bottom: 1.25rem;
+}
+
+.login__inputs,
+.login__box {
+  display: grid;
+}
+
+.login__inputs {
+  row-gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.login__box {
+  grid-template-columns: 1fr max-content;
+  column-gap: 0.75rem;
+  align-items: center;
+  border: 2px solid hsla(0, 0%, 100%, 0.7);
+  padding-inline: 1.25rem;
+  border-radius: 4rem;
+}
+
+.login__input,
+.login__button {
+  border: none;
+  outline: none;
+}
+
+.login__input {
+  width: 100%;
+  background: none;
+  color: var(--white-color);
+  padding-block: 1rem;
+}
+
+.login__input::placeholder {
+  color: var(--white-color);
+}
+
+.login__box i {
+  font-size: 1.25rem;
+}
+
+.login__check,
+.login__check-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.login__check {
+  margin-bottom: 1rem;
+  font-size: var(--small-font-size);
+}
+
+.login__check-box {
+  column-gap: 0.5rem;
+}
+
+.login__check-input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--white-color);
+}
+
+.login__forgot {
+  color: var(--white-color);
+}
+
+.login__forgot:hover {
+  text-decoration: underline;
+}
+
+.login__button {
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--white-color);
+  border-radius: 4rem;
+  color: var(--black-color);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.login__register {
+  font-size: var(--small-font-size);
+  text-align: center;
+}
+
+.login__register a {
+  color: var(--white-color);
+  font-weight: 500;
+}
+
+.login__register a:hover {
+  text-decoration: underline;
+}
+
+/*=============== BREAKPOINTS ===============*/
+/* For medium devices */
+@media screen and (min-width: 576px) {
+  .login {
+    justify-content: center;
+  }
+  .login__form {
+    width: 420px;
+    padding-inline: 2.5rem;
+  }
+  .login__title {
+    margin-bottom: 2rem;
+  }
+}
+
+/* Consistent spacing between fields */
+.login__box {
+  margin-bottom: 1.5rem; /* Add consistent spacing */
+}
+
+/* Improved checkbox styling */
+.login__check-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--small-font-size);
+  color: var(--white-color);
+}
+
+.login__check-input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--white-color); /* Modern checkbox styling */
+}
+/* Flash message styling */
+.alert {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.alert-dismissible .close {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  color: inherit;
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.requirement {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.4rem 0.8rem;
+  background-color: hsla(0, 0%, 100%, 0.01);
+  border: 2px solid hsla(0, 0%, 100%, 0.7); 
+  border-radius: 2rem;
+  color: var(--white-color);
+  font-size: 0.75rem; /* even smaller font */
+  font-weight: 400;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, opacity 0.3s ease, max-height 0.5s ease;
+  backdrop-filter: blur(6px); /* subtle glass effect */
+  max-height: 100px;
+  overflow: hidden;
+}
+
+.requirement-text {
+  flex: 1;
+  padding-right: 8px;
+}
+
+/* Base style for icons */
+.requirement i {
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  opacity: 0.8;
+  transform: scale(0.9);
+}
+
+/* When it's a tick */
+.bx-check-circle {
+  color: #16c06b !important; 
+  opacity: 1;
+  transform: scale(1.1);
+  border-radius: 50%;
+}
+
+/* Crosses */
+.bx-x-circle {
+  color: #ff4c4c !important;
+  box-shadow: none;
+}
+
+.requirement:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+#passwordRequirements.fade-out {
+  opacity: 0;
+  max-height: 0;
+  transition: opacity 0.5s ease, max-height 0.5s ease;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+.field-row {
+  display: flex;
+  align-items: center; /* center everything vertically */
+  gap: 0.5rem; /* gap between bubble and tick */
+  width: 100%;
+}
+.tick-wrapper {
+  display: flex;
+  align-items: center;
+}

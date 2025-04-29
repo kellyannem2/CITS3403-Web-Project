@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> <!-- This is the MAIN merged version which i am updating with my code-->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -13,7 +13,30 @@
   <!-- Main content for Calorie Counter -->
   <main>
     <h2>Calorie Counter</h2>
-    <button>+ Add Meal Entry</button>
+
+         <!-- start-->
+    <button id="openCountModalBtn" class="button">+ Add Meal Entry</button>
+         <!-- The Modal -->
+    <div id="countModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeCountModalBtn">&times;</span>
+        <h2>Add Meal</h2>
+        <form>
+          <label>Date:</label><br />
+          <input type="date" required><br /><br />
+    
+          <label>Meal:</label><br />
+          <input type="text" placeholder="e.g. Snack"><br /><br />
+    
+          <label>Calories:</label><br />
+          <input type="text" placeholder="e.g. 300"><br /><br />
+    
+          <button type="submit">Add</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- end -->
     <table>
       <thead>
         <tr>
@@ -78,6 +101,8 @@
   <footer>
     &copy; 2025 FitTrack. All rights reserved.
   </footer>
+
+  <script src="/static/JS/calorie_counter.js"></script>
 
 </body>
 </html>

@@ -1,0 +1,39 @@
+<!-- baselogin.html (new base for the login pages)-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}FitTrack{% endblock %}</title>
+
+  <!-- Shared styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login_page.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+  <!-- Page-specific extra CSS -->
+  {% block head %}{% endblock %}
+</head>
+<body class="{% if request.endpoint in ['login', 'reset_pass', 'signup', 'usernamepassreset'] %}login{% endif %}">
+  <!-- Shared Background -->
+  <img src="{{ url_for('static', filename='images/login-bg.png') }}" alt="Background" class="login__bg">
+
+  {% block header %}{% endblock %}
+
+  {# Conditionally wrap only login/reset/signup pages #}
+  {% if request.endpoint in ['login', 'reset_pass', 'signup', 'usernamepassreset'] %}
+    <div class="login__form">
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+  {% if request.endpoint in ['login', 'reset_pass', 'signup', 'usernamepassreset'] %}
+    </div>
+  {% endif %}
+
+  <!-- Page-specific extra JS -->
+  {% block scripts %}{% endblock %}
+</body>
+</html>

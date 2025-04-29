@@ -1,60 +1,66 @@
+{% extends "baselogin.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - FitTracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-</head>
-<body>
+{% block title %}Login{% endblock %}
 
-    <div class="container">
-        <div class="content">
-            <div class="Login">
-                <h1>FitTracker</h1>
-                <h1>Login</h1>
+{% block content %}
+<div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
 
-                {% with messages = get_flashed_messages(with_categories=True) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            </div>
+<h1 class="login__title">
+    {% if session.get('username') %}
+        Welcome Back to FitTrack, {{ session['username'] }}!
+    {% else %}
+        Log In To FitTrack
+    {% endif %}
+</h1>
 
-            <div class="overlay">
-                <form action="/login" method="POST">
-                    <input type="text" id="username" name="username" placeholder="Username" required><br>
-                    <input type="password" id="password" name="password" placeholder="Password" required><br>
-
-                    <input type="button" class="password_button" id="button" value="Show" onclick="togglePassword()">
-                    <input type="submit" value="Submit">
-                </form>
-
-                <p><a href="/reset_pass" class="link">Reset Password</a></p>
-                <p><a href="/signup" class="link">Sign Up</a></p>
-            </div>
-        </div>
+<form action="{{ url_for('login') }}" method="POST" class="login__inputs">
+    <div class="login__box" style="position: relative;">
+        <i class="bx bx-user" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);"></i>
+        <input type="text" id="username" name="username" class="login__input" placeholder="Username" required style="padding-left: 20px;">
     </div>
+    <div class="login__box" style="position: relative;">
+        <i class="bx bx-lock" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);"></i>
+        <input type="password" id="password" name="password" class="login__input" placeholder="Password" required style="padding-left: 20px; padding-right: 25px;">
+        <i class="bx bx-show" id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+    </div>
+    <div class="login__check">
+        <label class="login__check-label">
+            <input type="checkbox" id="remember" name="remember_me" class="login__check-input">
+            <span>Remember me</span>
+        </label>
+        <a href="{{ url_for('reset_pass') }}" class="login__forgot">Forgot password?</a>
+    </div>
+    <button type="submit" class="login__button">Sign in</button>
+</form>
+<p class="login__register">
+    Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a>
+</p>
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
 
-    <!-- JavaScript to toggle password visibility -->
-    <script>
-        function togglePassword() {
-            var x = document.getElementById("password");
-            var btn = document.getElementById("button");
-            if (x.type === "password") {
-                x.type = "text";
-                btn.value = "Hide";
-            } else {
-                x.type = "password";
-                btn.value = "Show";
-            }
-        }
-    </script>
+    togglePassword.addEventListener('click', function () {
+        // Toggle the type attribute
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        
+        // Toggle the eye icon
+        this.classList.toggle('bx-show');
+        this.classList.toggle('bx-hide');
+    });
+</script>
 
-</body>
-</html>
+{% endblock %}

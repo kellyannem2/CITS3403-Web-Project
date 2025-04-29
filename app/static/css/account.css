@@ -1,0 +1,144 @@
+/* account.css */
+
+/* Base font for account page */
+body.account-page {
+  font-family: 'Montserrat', sans-serif;
+  background: #f4f6f8;
+  padding-top: 80px; /* below header */
+  margin: 0;
+}
+
+/* Card container */
+.account-page .account-card {
+  position: relative;
+  z-index: 1;
+  width: 90%;
+  max-width: 700px;
+  margin: 100px auto 40px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+/* Avatar wrapper */
+.account-page .avatar-wrapper {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.account-page .avatar-wrapper .avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+/* Heading */
+.account-page .account-heading {
+  margin-top: 70px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  color: #333;
+}
+
+/* User details - centered and stacked with refined spacing */
+.account-page .account-info {
+  margin: 2rem 0;
+}
+.account-page .account-info .info-item {
+  display: block;
+  text-align: center;
+  margin: 1.5rem 0;              /* bigger spacing between entries */
+  font-size: 1.1rem;
+  line-height: 1.2;             /* tighter line-height for label/value */
+}
+.account-page .account-info .info-item strong {
+  display: block;
+  margin-bottom: 0.25rem;       /* reduced space between label and value */
+  color: #555;
+}
+
+/* Note */
+.account-page .info-note {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Tabs */
+.account-page .tabs {
+  display: flex;
+  background: #e9e9e9;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  list-style: none;
+  padding: 0;
+}
+.account-page .tab-link {
+  flex: 1;
+  text-align: center;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: #555;
+  transition: background 0.2s, color 0.2s;
+}
+.account-page .tab-link.active {
+  background: #007bff;
+  color: #fff;
+}
+
+/* Tab content */
+.account-page .tab-content {
+  display: none;
+}
+.account-page .tab-content.active {
+  display: block;
+}
+
+/* Forms */
+.account-page .form-group {
+  margin-bottom: 1rem;
+}
+.account-page .form-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+  color: #333;
+}
+.account-page .form-group input {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+/* Buttons */
+.account-page .btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.account-page .btn:hover {
+  background: #0056b3;
+}

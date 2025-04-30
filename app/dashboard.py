@@ -25,6 +25,12 @@ def dashboard():
         ExerciseLog.user_id == user.id,
         ExerciseLog.date == date.today()
     ).scalar() or 0
+    
+    todays_exercises = ExerciseLog.query.filter(
+    ExerciseLog.date == date.today(),
+    ExerciseLog.user_id == user.id
+    ).all()
+
 
     # 3️⃣ Update or create today's scoreboard entry
     scoreboard_entry = Scoreboard.query.filter_by(
@@ -56,13 +62,24 @@ def dashboard():
         ).order_by(Scoreboard.total_calories_burned.desc()).all()
 
     # 5️⃣ Prepare weekly data for Chart.js
-    past_week = date.today() - timedelta(days=6)
+    today = date.today()
+    weekday = today.weekday()
+
+    if weekday == 0:
+        # If today is Monday ➔ Start new week
+        week_start = today
+    else:
+        # Otherwise, week started on last Monday
+        week_start = today - timedelta(days=weekday)
+
+    # Query only from this week's Monday to today
     weekly_results = db.session.query(
         Scoreboard.timestamp,
         func.sum(Scoreboard.total_calories_burned)
     ).filter(
         Scoreboard.user_id == user.id,
-        Scoreboard.timestamp >= past_week
+        Scoreboard.timestamp >= week_start,
+        Scoreboard.timestamp <= today
     ).group_by(Scoreboard.timestamp).all()
 
     # Map dates to weekdays
@@ -75,7 +92,7 @@ def dashboard():
         user=user,
         exercise=user.exercises,
         meal=user.meals,
-        exercise_log=user.exercise_logs,
+        exercise_log=todays_exercises,
         meal_log=user.meal_logs,
         scoreboard=team_member_scoreboard,
         user_total_calories_burnt=total_calories,

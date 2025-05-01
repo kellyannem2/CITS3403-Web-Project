@@ -14,16 +14,28 @@
     <div class="columns">
 
       <!-- Leaderboard Column -->
-      <div class="column">
-        <div class="column-header">
-            <h2 onclick="location.href='{{ url_for('leaderboard') }}'" style="cursor:pointer;">Leaderboard</h2>
-        </div>
-        <p class="subheading">Today's scoreboard</p>
-        <div id="scoreboard-section"></div>
-    
-        <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
-        <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
-      </div>
+<div class="column">
+  <div class="column-header">
+    <h2 onclick="location.href='{{ url_for('leaderboard') }}'" style="cursor:pointer;">Leaderboard</h2>
+  </div>
+  <p class="subheading">Today's scoreboard</p>
+
+  <!-- Team Selector Form -->
+  <form action="/update_team" method="POST" style="margin-bottom: 10px;">
+    <label for="team">Select Team:</label>
+    <select name="team" id="team">
+      {% for team_name in all_teams %}
+        <option value="{{ team_name }}" {% if user.team == team_name %}selected{% endif %}>{{ team_name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Join</button>
+  </form>
+
+  <div id="scoreboard-section"></div>
+  <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
+  <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
+</div>
+
 
       <!-- Exercise Log Column -->
       <div class="column">

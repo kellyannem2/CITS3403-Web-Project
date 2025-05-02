@@ -5,7 +5,8 @@
 
   <!-- Date Picker -->
   <label for="log-date">Date:</label>
-  <input type="date" id="log-date" name="log_date" required>
+  <input type="date" id="log-date" name="log_date" value="{{ date.today().isoformat() }}" required>
+
   <br><br>
 
   <!-- Default Exercise Selection -->

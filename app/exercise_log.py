@@ -1,7 +1,7 @@
 from flask import request, redirect, url_for, flash, session, render_template
 from app import app, db
 from app.models import User, Exercise, ExerciseLog, Scoreboard
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from sqlalchemy import func
 
 # Route to log a new exercise (handles both default and custom)
@@ -17,9 +17,7 @@ def add_exercise():
         flash("User not found.", "error")
         return redirect(url_for("login"))
 
-    from datetime import datetime
-
-    # Get submitted date or use today
+    # Get submitted date or fallback
     try:
         log_date_str = request.form.get("log_date")
         log_date = datetime.strptime(log_date_str, "%Y-%m-%d").date()
@@ -126,5 +124,6 @@ def exercise_log_page():  # ✅ Unique function name
     return render_template(
         'exercise_log.html',
         exercise_log=all_logs,
-        chart_data=chart_data
+        chart_data=chart_data,
+        date=date 
     )

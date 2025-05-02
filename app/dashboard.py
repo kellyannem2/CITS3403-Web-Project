@@ -89,18 +89,20 @@ def dashboard():
         scoreboard=team_member_scoreboard,
         user_total_calories_burnt=total_calories,
         chart_data=chart_data,
-        all_teams=all_teams
+        all_teams=all_teams,
+        date=date  # ✅ Needed for {{ date.today().isoformat() }} in form
     )
 
-# ❌ Removed: @app.route('/exercise-log')
 
 @app.route('/calorie-counter')
 def calorie_counter():
     return render_template('calorie_counter.html')
 
+
 @app.route('/leaderboard')
 def leaderboard():
     return render_template('leaderboard.html')
+
 
 @app.route('/refresh_scoreboard')
 def refresh_scoreboard():
@@ -125,6 +127,7 @@ def refresh_scoreboard():
     ).order_by(Scoreboard.total_calories_burned.desc()).all()
 
     return render_template('partials/scoreboard.html', scoreboard=team_member_scoreboard)
+
 
 @app.route('/update_team', methods=['POST'])
 def update_team():

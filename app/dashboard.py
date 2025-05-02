@@ -89,12 +89,10 @@ def dashboard():
         scoreboard=team_member_scoreboard,
         user_total_calories_burnt=total_calories,
         chart_data=chart_data,
-        all_teams=all_teams  # ⬅️ Used for dropdown in template
+        all_teams=all_teams
     )
 
-@app.route('/exercise-log')
-def exercise_log():
-    return render_template('exercise_log.html')
+# ❌ Removed: @app.route('/exercise-log')
 
 @app.route('/calorie-counter')
 def calorie_counter():

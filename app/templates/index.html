@@ -7,190 +7,161 @@
 </head>
 <body>
 
+{% include 'header.html' %}
 
-  {% include 'header.html' %}
+<main>
+  <div class="columns">
 
-  <main>
-    <div class="columns">
-
-      <!-- Leaderboard Column -->
-      <div class="column">
-        <div class="column-header">
-            <h2 onclick="location.href='{{ url_for('leaderboard') }}'" style="cursor:pointer;">Leaderboard</h2>
-        </div>
-        <p class="subheading">Today's scoreboard</p>
-        <div id="scoreboard-section"></div>
-    
-        <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
-        <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
+    <!-- Leaderboard Column -->
+    <div class="column">
+      <div class="column-header">
+        <h2 onclick="location.href='{{ url_for('leaderboard') }}'" style="cursor:pointer;">Leaderboard</h2>
       </div>
+      <p class="subheading">Today's scoreboard</p>
 
-      <!-- Exercise Log Column -->
-      <div class="column">
+      <!-- Create Team Form -->
+      <form action="/update_team" method="POST" style="margin-bottom: 10px;">
+        <label for="new_team"><strong>Create a New Team:</strong></label><br>
+        <input type="text" name="new_team" placeholder="Enter team name">
+        <button type="submit">Create</button>
+      </form>
 
-        {% include 'partials/add_exercise_form.html' %}
+      <!-- Team Selector Form -->
+      <form action="/update_team" method="POST">
+        <label for="team"><strong>Select Team:</strong></label>
+        <select name="team" id="team">
+          {% for team_name in all_teams %}
+            <option value="{{ team_name }}" {% if user.team == team_name %}selected{% endif %}>{{ team_name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Join</button>
+      </form>
 
+      <div id="scoreboard-section"></div>
+      <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
+      <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
+    </div>
+
+    <!-- Exercise Log Column -->
+    <div class="column">
+      {% include 'partials/add_exercise_form.html' %}
       <br> <hr> <br>
 
-        <div class="column-header">
-          <h2 onclick="location.href='{{ url_for('exercise_log') }}'" style="cursor:pointer;">Exercise Log</h2>
-         <!-- <button class="add-btn" title="Add an Exercise">+</button> -->
+      <div class="column-header">
+        <h2 onclick="location.href='{{ url_for('exercise_log') }}'" style="cursor:pointer;">Exercise Log</h2>
+        <button id="openModalBtn" class="add-btn" title="Add an Exercise">+</button>
+      </div>
 
+      <table>
+        <thead>
+          <tr>
+            <th>Exercise</th>
+            <th>Duration</th>
+            <th>Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in exercise_log %}
+          <tr>
+            <td>{{ log.exercise.name }}</td>
+            <td>{{ log.duration_minutes }} min</td>
+            <td>{{ log.calories_burned }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3">No logs yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
-<!-- Trigger Button -->
-      <button id="openModalBtn" class="add-btn" title="Add an Exercise">+</button>
-        <!-- The Modal -->
-        <div id="modal" class="modal">
-          <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h2>Add Exercise</h2>
-            <form>
-              <label>Exercise:</label><br />
-              <input type="text" placeholder="e.g. Running"><br /><br />
-              <label>Duration:</label><br />
-              <input type="text" placeholder="e.g. 30 min"><br /><br />
-              <label>Calories:</label><br />
-              <input type="text" placeholder="e.g. 300"><br /><br />
-              <button type="submit">Add</button>
-            </form>
-          </div>
-        </div>
-
-        <!-- End Modal -->
-
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Exercise</th>
-              <th>Duration</th>
-              <th>Calories</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for log in exercise_log%}
-            <tr>
-              <td>{{ log.exercise.name }}</td>
-              <td>{{ log.duration_minutes }} min</td>
-              <td>{{ log.calories_burned }}</td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="3">No logs yet</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <div class="total-summary">
+      <div class="total-summary">
         <span>Total: {{ user_total_calories_burnt }} cal</span>
-        </div>
-        <h3>Weekly Calories Burned</h3>
-        <canvas id="dashboardExerciseChart" width="400" height="200"></canvas>
-        <a href="{{ url_for('exercise_log') }}" class="btn-link">View More</a>
       </div>
 
-      <!-- Calorie Counter Column -->
-      <div class="column">
-        <div class="column-header">
-          <h2 onclick="location.href='{{ url_for('calorie_counter') }}'" style="cursor:pointer;">Calorie Counter</h2>
-         <!-- <button class="add-btn" title="Add a Meal">+</button> -->
-      <!-- Trigger Button -->
-      <button id="openMealModalBtn" class="add-btn" title="Add a Meal">+</button>
-
-      <!-- The Modal -->
-      <div id="mealModal" class="modal">
-        <div class="modal-content">
-          <span class="close-btn" id="closeMealModal">&times;</span>
-          <h2>Add Meal</h2>
-          <form>
-            <label>Meal:</label><br />
-            <input type="text" placeholder="e.g. Snack"><br /><br />
-            <label>Calories:</label><br />
-            <input type="text" placeholder="e.g. 300"><br /><br />
-            <button type="submit">Add</button>
-          </form>
-        </div>
-      </div>
-
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Meal</th>
-              <th>Calories</th>
-            </tr>
-          </thead>
-          <tbody>
-              {% for log in meal_logs%}
-              <tr>
-                <td>{{ log.date }}</td>
-                <td>{{ log.meal.name }}</td>
-                <td>{{ log.meal.calories }}</td>
-              </tr>
-              {% else %}
-              <tr>
-                <td colspan="3">No logs yet</td>
-              </tr>
-              {% endfor %}
-          </tbody>
-        </table>
-        <div class="total-summary"><span>Total: 1,650</span></div>
-        <h3>Weekly Calorie Intake</h3>
-        <canvas id="dashboardCalorieChart" width="400" height="200"></canvas>
-        <a href="{{ url_for('calorie_counter') }}" class="btn-link">View More</a>
-      </div>
-
+      <h3>Weekly Calories Burned</h3>
+      <canvas id="dashboardExerciseChart" width="400" height="200"></canvas>
+      <a href="{{ url_for('exercise_log') }}" class="btn-link">View More</a>
     </div>
-  </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const chartData = {{ chart_data | tojson }};
+    <!-- Calorie Counter Column -->
+    <div class="column">
+      <div class="column-header">
+        <h2 onclick="location.href='{{ url_for('calorie_counter') }}'" style="cursor:pointer;">Calorie Counter</h2>
+        <button id="openMealModalBtn" class="add-btn" title="Add a Meal">+</button>
+      </div>
 
-    const ctxDashboardExercise = document.getElementById('dashboardExerciseChart').getContext('2d');
+      <table>
+        <thead>
+          <tr>
+            <th>Meal</th>
+            <th>Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in meal_logs %}
+          <tr>
+            <td>{{ log.date }}</td>
+            <td>{{ log.meal.name }}</td>
+            <td>{{ log.meal.calories }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3">No logs yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
-    new Chart(ctxDashboardExercise, {
-      type: 'bar',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Calories Burned',
-          data: chartData,
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
-    });
+      <div class="total-summary"><span>Total: 1,650</span></div>
+      <h3>Weekly Calorie Intake</h3>
+      <canvas id="dashboardCalorieChart" width="400" height="200"></canvas>
+      <a href="{{ url_for('calorie_counter') }}" class="btn-link">View More</a>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const chartData = {{ chart_data | tojson }};
+
+  const ctxDashboardExercise = document.getElementById('dashboardExerciseChart').getContext('2d');
+  new Chart(ctxDashboardExercise, {
+    type: 'bar',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        label: 'Calories Burned',
+        data: chartData,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  const ctxDashboardCalorie = document.getElementById('dashboardCalorieChart').getContext('2d');
+  new Chart(ctxDashboardCalorie, {
+    type: 'line',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        label: 'Calorie Intake',
+        data: [2100, 2000, 2200, 2300, 2100, 1900, 2000],
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        fill: true,
+        tension: 0.1,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: { y: { beginAtZero: true } }
+    }
+  });
 </script>
 
-<script>
-    // Dashboard Calorie Counter Chart
-    const ctxDashboardCalorie = document.getElementById('dashboardCalorieChart').getContext('2d');
-    new Chart(ctxDashboardCalorie, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Calorie Intake',
-          data: [2100, 2000, 2200, 2300, 2100, 1900, 2000],
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          borderColor: 'rgba(255, 99, 132, 1)',
-          fill: true,
-          tension: 0.1,
-          borderWidth: 1
-        }]
-      },
-      options: { scales: { y: { beginAtZero: true } } }
-    });
-  </script>
-
-  <footer>&copy; 2025 FitTrack. All rights reserved.</footer>
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<footer>&copy; 2025 FitTrack. All rights reserved.</footer>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

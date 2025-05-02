@@ -2,11 +2,10 @@ from flask import render_template, session, redirect, url_for, flash, request
 from app import app, db
 from sqlalchemy import func
 from app.models import User, Scoreboard, ExerciseLog
-from datetime import datetime, date, timedelta
-import calendar
+from datetime import date, timedelta
+
 @app.route("/dashboard")
 def dashboard():
-    # 1️⃣ Check if user is logged in
     user_id = session.get("user_id")
     if not user_id:
         flash("You are not logged in. Please log in to access the dashboard.", "error")
@@ -18,21 +17,21 @@ def dashboard():
         session.pop("user_id", None)
         return redirect(url_for("login"))
 
-    # 2️⃣ Calculate today's total calories burned for the user
+    # 🔹 Total calories burned today
     total_calories = db.session.query(
         func.sum(ExerciseLog.calories_burned)
     ).filter(
         ExerciseLog.user_id == user.id,
         ExerciseLog.date == date.today()
     ).scalar() or 0
-    
-    todays_exercises = ExerciseLog.query.filter(
-    ExerciseLog.date == date.today(),
-    ExerciseLog.user_id == user.id
+
+    # 🔹 Today's exercises
+    todays_exercises = ExerciseLog.query.filter_by(
+        user_id=user.id,
+        date=date.today()
     ).all()
 
-
-    # 3️⃣ Update or create today's scoreboard entry
+    # 🔹 Scoreboard update or creation
     scoreboard_entry = Scoreboard.query.filter_by(
         user_id=user.id,
         timestamp=date.today()
@@ -41,16 +40,19 @@ def dashboard():
     if scoreboard_entry:
         scoreboard_entry.total_calories_burned = total_calories
     else:
-        new_entry = Scoreboard(
+        db.session.add(Scoreboard(
             user_id=user.id,
             total_calories_burned=total_calories,
             timestamp=date.today()
-        )
-        db.session.add(new_entry)
+        ))
 
     db.session.commit()
 
-    # 4️⃣ Prepare team scoreboard (for today's date)
+    # 🔹 Get all teams
+    all_teams = db.session.query(User.team).filter(User.team.isnot(None)).distinct().all()
+    all_teams = [team[0] for team in all_teams]
+
+    # 🔹 Today's team scoreboard
     team_member_scoreboard = []
     if user.team:
         team_users = User.query.filter_by(team=user.team).all()
@@ -61,18 +63,10 @@ def dashboard():
             Scoreboard.timestamp == date.today()
         ).order_by(Scoreboard.total_calories_burned.desc()).all()
 
-    # 5️⃣ Prepare weekly data for Chart.js
+    # 🔹 Weekly calories burned chart
     today = date.today()
-    weekday = today.weekday()
+    week_start = today - timedelta(days=today.weekday())  # Monday
 
-    if weekday == 0:
-        # If today is Monday ➔ Start new week
-        week_start = today
-    else:
-        # Otherwise, week started on last Monday
-        week_start = today - timedelta(days=weekday)
-
-    # Query only from this week's Monday to today
     weekly_results = db.session.query(
         Scoreboard.timestamp,
         func.sum(Scoreboard.total_calories_burned)
@@ -82,12 +76,10 @@ def dashboard():
         Scoreboard.timestamp <= today
     ).group_by(Scoreboard.timestamp).all()
 
-    # Map dates to weekdays
     week_data = {record[0].strftime('%a'): float(record[1]) for record in weekly_results}
     labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     chart_data = [week_data.get(day, 0) for day in labels]
 
-    # 6️⃣ Render dashboard with all data
     return render_template("index.html",
         user=user,
         exercise=user.exercises,
@@ -96,20 +88,21 @@ def dashboard():
         meal_log=user.meal_logs,
         scoreboard=team_member_scoreboard,
         user_total_calories_burnt=total_calories,
-        chart_data=chart_data
+        chart_data=chart_data,
+        all_teams=all_teams,
+        date=date  # ✅ Needed for {{ date.today().isoformat() }} in form
     )
 
-@app.route('/exercise-log')
-def exercise_log():
-    return render_template('exercise_log.html')
 
 @app.route('/calorie-counter')
 def calorie_counter():
     return render_template('calorie_counter.html')
 
+
 @app.route('/leaderboard')
 def leaderboard():
     return render_template('leaderboard.html')
+
 
 @app.route('/refresh_scoreboard')
 def refresh_scoreboard():
@@ -122,20 +115,19 @@ def refresh_scoreboard():
     if not user or not user.team:
         return render_template('partials/scoreboard.html', scoreboard=[])
 
-    # Get all users in the same team
     team_users = User.query.filter_by(team=user.team).all()
     team_user_ids = [u.id for u in team_users]
 
     if not team_user_ids:
         return render_template('partials/scoreboard.html', scoreboard=[])
 
-    # Get today's scoreboard for team members
     team_member_scoreboard = Scoreboard.query.filter(
         Scoreboard.user_id.in_(team_user_ids),
         Scoreboard.timestamp == date.today()
     ).order_by(Scoreboard.total_calories_burned.desc()).all()
 
     return render_template('partials/scoreboard.html', scoreboard=team_member_scoreboard)
+
 
 @app.route('/update_team', methods=['POST'])
 def update_team():
@@ -144,7 +136,7 @@ def update_team():
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
-    new_team = request.form.get('team')
+    new_team = request.form.get('team') or request.form.get('new_team')
 
     if not new_team or not new_team.strip():
         flash("Team name cannot be empty.", "warning")

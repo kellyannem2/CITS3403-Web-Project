@@ -91,9 +91,9 @@ def add_exercise():
     return redirect(url_for("dashboard"))
 
 
-# Exercise Log Page (full history + weekly chart)
-@app.route('/exercise-log', endpoint='exercise_log')  # ✅ Clean endpoint name preserved
-def exercise_log_page():  # ✅ Unique function name
+# Exercise Log Page (week-based)
+@app.route('/exercise-log', endpoint='exercise_log')
+def exercise_log_page():
     user_id = session.get("user_id")
     if not user_id:
         flash("You are not logged in. Please log in to access this page.", "error")
@@ -101,20 +101,32 @@ def exercise_log_page():  # ✅ Unique function name
 
     user = User.query.get(user_id)
 
-    # All logs for user
-    all_logs = ExerciseLog.query.filter_by(user_id=user.id).order_by(ExerciseLog.date.desc()).all()
+    # Get week offset (0=this week, -1=last week, etc.)
+    try:
+        week_offset = int(request.args.get("week", 0))
+    except ValueError:
+        week_offset = 0
 
-    # Weekly chart data
+    # Calculate week range
     today = date.today()
-    week_start = today - timedelta(days=today.weekday())
+    start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
+    end_of_week = start_of_week + timedelta(days=6)
 
+    # Logs in selected week
+    logs = ExerciseLog.query.filter(
+        ExerciseLog.user_id == user.id,
+        ExerciseLog.date >= start_of_week,
+        ExerciseLog.date <= end_of_week
+    ).order_by(ExerciseLog.date.desc()).all()
+
+    # Weekly chart
     weekly_results = db.session.query(
         Scoreboard.timestamp,
         func.sum(Scoreboard.total_calories_burned)
     ).filter(
         Scoreboard.user_id == user.id,
-        Scoreboard.timestamp >= week_start,
-        Scoreboard.timestamp <= today
+        Scoreboard.timestamp >= start_of_week,
+        Scoreboard.timestamp <= end_of_week
     ).group_by(Scoreboard.timestamp).all()
 
     week_data = {r[0].strftime('%a'): float(r[1]) for r in weekly_results}
@@ -123,7 +135,10 @@ def exercise_log_page():  # ✅ Unique function name
 
     return render_template(
         'exercise_log.html',
-        exercise_log=all_logs,
+        exercise_log=logs,
         chart_data=chart_data,
-        date=date 
+        date=date,
+        week_offset=week_offset,
+        start_of_week=start_of_week,
+        end_of_week=end_of_week
     )

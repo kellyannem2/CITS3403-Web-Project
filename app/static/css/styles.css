@@ -271,3 +271,36 @@
   cursor: pointer;
 }
 
+.week-nav-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.week-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.week-range {
+  font-weight: 500;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.week-btn {
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  padding: 0.25rem 0.75rem;
+  transition: transform 0.1s ease;
+}
+
+.week-btn:hover {
+  transform: scale(1.05);
+}

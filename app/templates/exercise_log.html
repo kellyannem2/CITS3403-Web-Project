@@ -2,8 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>FitTrack Calorie Counter</title>
+  <title>FitTrack Exercise Log</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <style>
+    .week-nav-wrapper {
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+
+    .week-nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .week-range {
+      font-weight: bold;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .week-btn {
+      background: none;
+      border: none;
+      color: #000;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      padding: 0.25rem 0.75rem;
+      transition: transform 0.1s ease;
+    }
+
+    .week-btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
 
@@ -13,6 +48,25 @@
   <!-- Main content for Exercise Log -->
   <main>
     <h2>Exercise Log</h2>
+
+    <!-- Week Navigation -->
+    <div class="week-nav-wrapper">
+      <div class="week-nav-inner">
+        <form method="get" action="{{ url_for('exercise_log') }}">
+          <input type="hidden" name="week" value="{{ week_offset - 1 }}">
+          <button type="submit" class="week-btn">&#8592; Prev</button>
+        </form>
+
+        <div class="week-range">
+          {{ start_of_week.strftime('%b %d') }} – {{ end_of_week.strftime('%b %d, %Y') }}
+        </div>
+
+        <form method="get" action="{{ url_for('exercise_log') }}">
+          <input type="hidden" name="week" value="{{ week_offset + 1 }}">
+          <button type="submit" class="week-btn">Next &#8594;</button>
+        </form>
+      </div>
+    </div>
 
     <!-- Add Exercise Button -->
     <button id="openLogModalBtn" class="button">+ Add Exercise Entry</button>
@@ -28,8 +82,6 @@
 
     <!-- Exercise Log Table -->
     {% include 'partials/exerciselog.html' %}
-
-    <button class="btn-link">View More</button>
 
     <!-- Weekly Calories Chart -->
     <h3>Weekly Calories Burned</h3>

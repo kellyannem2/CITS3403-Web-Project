@@ -1,56 +1,65 @@
 <!-- partials/add_exercise_form.html -->
+<!-- Exercise Modal Trigger -->
+<button id="openExerciseModalBtn" class="add-btn" title="Add an Exercise">+</button>
 
-<!-- Add Exercise Form -->
-<form action="/add_exercise" method="POST">
+<!-- Exercise Modal -->
+<div id="exerciseModal" class="modal">
+  <div class="modal-content">
+    <span id="closeExerciseModal" class="close-btn">&times;</span>
+    <form action="/add_exercise" method="POST">
+      
+        <!-- Default Exercise Selection -->
+        <label for="default-exercise" style="font-weight: bold; text-align: center;">Choose an Exercise:</label> <br>
+        <select id="default-exercise" name="default_exercise">
+          <option value="">-- Select an exercise --</option>
+          <option value="Running">Running</option>
+          <option value="Jogging">Jogging</option>
+          <option value="Walking">Walking</option>
+          <option value="Cycling">Cycling</option>
+          <option value="Swimming (casual)">Swimming (casual)</option>
+          <option value="Swimming (vigorous)">Swimming (vigorous)</option>
+          <option value="Yoga">Yoga</option>
+          <option value="Pilates">Pilates</option>
+          <option value="Weight Lifting">Weight Lifting</option>
+          <option value="HIIT">HIIT Workout</option>
+          <option value="Aerobics">Aerobics Class</option>
+          <option value="Rowing">Rowing Machine</option>
+          <option value="Jump Rope">Jump Rope</option>
+          <option value="Dancing">Dancing</option>
+          <option value="Hiking">Hiking</option>
+        </select>
+      
+        <br><br>
+      
+        <label for="default-minutes">Minutes:</label>
+        <input type="number" id="default-minutes" name="default_minutes" min="1" required>
+      
+        <button type="submit">Add</button>
+      
+        <br><br>
+      
+        <!-- Custom Exercise Section -->
+        <p style="font-weight: bold; text-align: center;">OR Add Your Own Exercise:</p>
+        <br> 
+        <label for="custom-name">Exercise Name:</label>
+        <input type="text" id="custom-name" name="custom_name">
+      
+        <br><br>
+      
+        <label for="custom-minutes">Minutes:</label>
+        <input type="number" id="custom-minutes" name="custom_minutes" min="1">
+      
+        <br><br>
+      
+        <label for="custom-calories">Estimated Calories Burned (per 30 min):</label>
+        <input type="number" id="custom-calories" name="custom_calories" min="0">
+      
+        <br><br>
+      
+        <button type="submit">Add Exercise</button>
+        </form>
+      </div>
+    </div>
+
   
-    <!-- Default Exercise Selection -->
-    <label for="default-exercise">Choose an Exercise:</label>
-    <select id="default-exercise" name="default_exercise">
-      <option value="">-- Select an exercise --</option>
-      <option value="Running">Running</option>
-      <option value="Jogging">Jogging</option>
-      <option value="Walking">Walking</option>
-      <option value="Cycling">Cycling</option>
-      <option value="Swimming (casual)">Swimming (casual)</option>
-      <option value="Swimming (vigorous)">Swimming (vigorous)</option>
-      <option value="Yoga">Yoga</option>
-      <option value="Pilates">Pilates</option>
-      <option value="Weight Lifting">Weight Lifting</option>
-      <option value="HIIT">HIIT Workout</option>
-      <option value="Aerobics">Aerobics Class</option>
-      <option value="Rowing">Rowing Machine</option>
-      <option value="Jump Rope">Jump Rope</option>
-      <option value="Dancing">Dancing</option>
-      <option value="Hiking">Hiking</option>
-    </select>
-  
-    <br><br>
-  
-    <label for="default-minutes">Minutes:</label>
-    <input type="number" id="default-minutes" name="default_minutes" min="1" required>
-  
-    <button type="submit">Add</button>
-  
-    <br><br>
-  
-    <!-- Custom Exercise Section -->
-    <p style="font-weight: bold;">OR Add Your Own Exercise:</p>
-  
-    <label for="custom-name">Exercise Name:</label>
-    <input type="text" id="custom-name" name="custom_name">
-  
-    <br><br>
-  
-    <label for="custom-minutes">Minutes:</label>
-    <input type="number" id="custom-minutes" name="custom_minutes" min="1">
-  
-    <br><br>
-  
-    <label for="custom-calories">Estimated Calories Burned (per 30 min):</label>
-    <input type="number" id="custom-calories" name="custom_calories" min="0">
-  
-    <br><br>
-  
-    <button type="submit">Add Exercise</button>
-  </form>
-  
+  <script src="{{ url_for('static', filename='js/exercise_log.js') }}"></script>

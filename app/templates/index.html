@@ -28,18 +28,29 @@
       <!-- Exercise Log Column -->
       <div class="column">
 
-        {% include 'partials/add_exercise_form.html' %}
-
-      <br> <hr> <br>
-
         <div class="column-header">
           <h2 onclick="location.href='{{ url_for('exercise_log') }}'" style="cursor:pointer;">Exercise Log</h2>
          <!-- <button class="add-btn" title="Add an Exercise">+</button> -->
 
+         {% include 'partials/add_exercise_form.html' %}
 
-<!-- Trigger Button -->
+        <!-- Add Exercise Button <button id="openExerciseModalBtn" class="add-btn" title="Add an Exercise">+</button>-->
+        
+
+        <!-- Modal -->
+        <div id="exerciseModal" class="modal">
+          <div class="modal-content">
+            <span id="closeExerciseModal" class="close-btn">&times;</span>
+            {% include 'partials/add_exercise_form.html' %}
+          </div>
+        </div>
+
+        <script src="{{ url_for('static', filename='js/exercise_log.js') }}"></script>
+
+        
+<!--
       <button id="openModalBtn" class="add-btn" title="Add an Exercise">+</button>
-        <!-- The Modal -->
+       <
         <div id="modal" class="modal">
           <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -51,12 +62,12 @@
               <input type="text" placeholder="e.g. 30 min"><br /><br />
               <label>Calories:</label><br />
               <input type="text" placeholder="e.g. 300"><br /><br />
-              <button type="submit">Add</button>
+              <button type="submit">Add</button> 
             </form>
           </div>
         </div>
-
-        <!-- End Modal -->
+      -->
+        
 
         </div>
         <table>

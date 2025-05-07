@@ -230,3 +230,27 @@ def logout():
     session.pop("user_id", None)
     flash("You have been logged out.", "success")
     return redirect(url_for("login"))
+
+@app.route('/add_exercise', methods=['POST'])
+def add_exercise():
+    default_exercise = request.form.get('default_exercise')
+    default_minutes = request.form.get('default_minutes')
+    custom_name = request.form.get('custom_name')
+    custom_minutes = request.form.get('custom_minutes')
+    custom_calories = request.form.get('custom_calories')
+
+    if default_exercise and default_minutes:
+        exercise = default_exercise
+        minutes = int(default_minutes)
+    elif custom_name and custom_minutes and custom_calories:
+        exercise = custom_name
+        minutes = int(custom_minutes)
+        calories = int(custom_calories)
+    else:
+        return redirect('/dashboard') 
+
+    new_exercise = ExerciseLog(name=exercise, minutes=minutes, calories=calories)
+    db.session.add(new_exercise)
+    db.session.commit()
+
+    return redirect('/dashboard')

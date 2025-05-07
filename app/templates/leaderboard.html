@@ -1,0 +1,122 @@
+<!DOCTYPE html> <!-- This is a very rough copy-paste draft of the leaderboard page - copied from the calorie count page -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FitTrack Leaderboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+  <!-- Shared Header -->
+  {% include 'header.html' %}
+
+  <!-- Main content for Leaderboard -->
+  <main>
+    <h2>Leaderboard</h2>
+
+    <p class="subheading">Today's scoreboard</p>
+    <!----->
+
+    <p class="subheading">Team:</p>
+    <!---->
+
+
+         <!-- start-->
+    <button id="openCountModalBtn" class="button">+ Add Meal Entry</button>
+         <!-- The Modal -->
+    <div id="countModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeCountModalBtn">&times;</span>
+        <h2>Add Meal</h2>
+        <form>
+          <label>Date:</label><br />
+          <input type="date" required><br /><br />
+    
+          <label>Meal:</label><br />
+          <input type="text" placeholder="e.g. Snack"><br /><br />
+    
+          <label>Calories:</label><br />
+          <input type="text" placeholder="e.g. 300"><br /><br />
+    
+          <button type="submit">Add</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- end -->
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Meal</th>
+          <th>Calories</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2025-04-12</td>
+          <td>Breakfast</td>
+          <td>350</td>
+        </tr>
+        <tr>
+          <td>2025-04-12</td>
+          <td>Lunch</td>
+          <td>600</td>
+        </tr>
+        <tr>
+          <td>2025-04-12</td>
+          <td>Dinner</td>
+          <td>700</td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="btn-link">View More</button>
+
+    <!-- Graph for Leaderboard -->
+    <h3>Leaderboard</h3>
+        </div>
+        <p class="subheading">Today's scoreboard</p>
+        <div id="scoreboard-section"></div>
+
+        <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
+        <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
+        </div>
+
+  </main>
+
+  <!-- Load Chart.js from CDN           TODO: add same link from index to display leaderboard-->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctxCalorie = document.getElementById('calorieChart').getContext('2d');
+    const calorieChart = new Chart(ctxCalorie, {
+      type: 'line', // You can change to 'bar', 'pie', etc.
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Calorie Intake',
+          data: [2100, 2000, 2200, 2300, 2100, 1900, 2000], // Sample values
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          fill: true,
+          tension: 0.1,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
+
+  <footer>
+    &copy; 2025 FitTrack. All rights reserved.
+  </footer>
+
+  <script src="/static/JS/calorie_counter.js"></script>
+
+</body>
+</html>

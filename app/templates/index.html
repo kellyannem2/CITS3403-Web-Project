@@ -44,12 +44,20 @@
 
     <!-- Exercise Log Column -->
     <div class="column">
-      {% include 'partials/add_exercise_form.html' %}
-      <br> <hr> <br>
-
       <div class="column-header">
         <h2 onclick="location.href='{{ url_for('exercise_log') }}'" style="cursor:pointer;">Exercise Log</h2>
-        <button id="openModalBtn" class="add-btn" title="Add an Exercise">+</button>
+        <!-- <button id="openModalBtn" class="add-btn" title="Add an Exercise">+</button> -->
+        {% include 'partials/add_exercise_form.html' %}
+
+                <!-- Modal -->
+        <div id="exerciseModal" class="modal">
+          <div class="modal-content">
+            <span id="closeExerciseModal" class="close-btn">&times;</span>
+            {% include 'partials/add_exercise_form.html' %}
+          </div>
+        </div>
+        <script src="{{ url_for('static', filename='js/exercise_log.js') }}"></script>
+
       </div>
 
       <table>

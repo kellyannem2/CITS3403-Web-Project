@@ -37,7 +37,25 @@
         <button type="submit">Join</button>
       </form>
 
-      <div id="scoreboard-section"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>User</th>
+            <th>Net Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in scoreboard %}
+<tr>
+  <td>{{ loop.index }}</td>
+  <td><a href="{{ url_for('user_detail', user_id=entry.user.id) }}">{{ entry.user.full_name }}</a></td>
+  <td>{{ entry.net | round(2) }}</td>
+</tr>
+{% endfor %}
+
+      </table>
+
       <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
       <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
     </div>
@@ -46,10 +64,7 @@
     <div class="column">
       <div class="column-header">
         <h2 onclick="location.href='{{ url_for('exercise_log') }}'" style="cursor:pointer;">Exercise Log</h2>
-        <!-- <button id="openModalBtn" class="add-btn" title="Add an Exercise">+</button> -->
         {% include 'partials/add_exercise_form.html' %}
-
-                <!-- Modal -->
         <div id="exerciseModal" class="modal">
           <div class="modal-content">
             <span id="closeExerciseModal" class="close-btn">&times;</span>
@@ -57,7 +72,6 @@
           </div>
         </div>
         <script src="{{ url_for('static', filename='js/exercise_log.js') }}"></script>
-
       </div>
 
       <table>

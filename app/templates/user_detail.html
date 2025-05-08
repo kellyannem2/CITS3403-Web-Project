@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ user.username }}'s Profile</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+{% include 'header.html' %}
+
+<main>
+  <div class="columns">
+
+    <!-- Exercise Log Column -->
+    <div class="column">
+      <div class="column-header">
+        <h2>{{ user.full_name }}'s Exercise Log</h2>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Exercise</th>
+            <th>Duration</th>
+            <th>Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in exercise_log %}
+          <tr>
+            <td>{{ log.exercise.name }}</td>
+            <td>{{ log.duration_minutes }} min</td>
+            <td>{{ log.calories_burned }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3">No logs yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="total-summary">
+        <span>Total: {{ exercise_log | sum(attribute="calories_burned") | round(2) }} cal</span>
+      </div>
+
+      <h3>Weekly Calories Burned</h3>
+      <canvas id="weeklyExerciseChart" width="400" height="200"></canvas>
+    </div>
+
+    <!-- Calorie Counter Column -->
+    <div class="column">
+      <div class="column-header">
+        <h2>{{ user.full_name }}'s Calorie Counter</h2>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Meal</th>
+            <th>Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in meal_log %}
+          <tr>
+            <td>{{ log.meal.name }}</td>
+            <td>{{ log.meal.calories }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="2">No logs yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="total-summary">
+        <span>Total: {{ meal_log | sum(attribute="meal.calories") | round(2) }} cal</span>
+      </div>
+
+      <h3>Weekly Calorie Intake</h3>
+      <canvas id="weeklyIntakeChart" width="400" height="200"></canvas>
+    </div>
+
+  </div>
+
+  <a href="{{ url_for('dashboard') }}" class="btn-link" style="margin: 20px;">← Back to Dashboard</a>
+</main>
+
+<script>
+  const burnedData = {{ chart_data | tojson }};
+  const intakeData = [ {% for log in meal_log %} {{ log.meal.calories }}, {% endfor %} ];
+
+  const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // Calories Burned Chart
+  new Chart(document.getElementById('weeklyExerciseChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Calories Burned',
+        data: burnedData,
+        backgroundColor: 'rgba(54, 162, 235, 0.3)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+
+  // Calorie Intake Chart
+  new Chart(document.getElementById('weeklyIntakeChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: labels.slice(0, intakeData.length),
+      datasets: [{
+        label: 'Calorie Intake',
+        data: intakeData,
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

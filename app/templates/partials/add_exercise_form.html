@@ -13,7 +13,7 @@
         <label for="log-date">Date:</label>
         <input type="date" id="log-date" name="log_date" value="{{ date.today().isoformat() }}" required>
         <br><br>
-        <label for="default-exercise" style="font-weight: bold; text-align: center;">Choose an Exercise:</label> <br>
+        <label for="default-exercise" style="font-weight: bold; display: block; text-align: center;">Choose an Exercise:</label> <br>
         <select id="default-exercise" name="default_exercise">
           <option value="">-- Select an exercise --</option>
           <option value="Running">Running</option>
@@ -38,9 +38,11 @@
         <label for="default-minutes">Minutes:</label>
         <input type="number" id="default-minutes" name="default_minutes" min="1" required>
 
-        <button type="submit">Add</button>
+        <div style="text-align: center;">
+          <button type="submit">Add</button>
+        </div>
 
-        <br><br>
+        <br>
 
         <!-- Custom Exercise Section -->
         <p style="font-weight: bold; text-align: center;">OR Add Your Own Exercise:</p>
@@ -60,7 +62,9 @@
 
         <br><br>
 
-        <button type="submit">Add Exercise</button>
+        <div style="text-align: center;">
+          <button type="submit">Add Exercise</button>
+        </div>
         </form>
       </div>
     </div>

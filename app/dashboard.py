@@ -1,8 +1,9 @@
 from flask import render_template, session, redirect, url_for, flash, request
 from app import app, db
 from sqlalchemy import func
-from app.models import User, Scoreboard, ExerciseLog
+from app.models import User, Scoreboard, ExerciseLog, MealLog
 from datetime import date, timedelta
+
 
 @app.route("/dashboard")
 def dashboard():
@@ -52,16 +53,30 @@ def dashboard():
     all_teams = db.session.query(User.team).filter(User.team.isnot(None)).distinct().all()
     all_teams = [team[0] for team in all_teams]
 
-    # 🔹 Today's team scoreboard
+    # 🔹 Custom Team Leaderboard: Net Calories = Eaten - Burned
     team_member_scoreboard = []
     if user.team:
         team_users = User.query.filter_by(team=user.team).all()
-        team_user_ids = [u.id for u in team_users]
 
-        team_member_scoreboard = Scoreboard.query.filter(
-            Scoreboard.user_id.in_(team_user_ids),
-            Scoreboard.timestamp == date.today()
-        ).order_by(Scoreboard.total_calories_burned.desc()).all()
+        for teammate in team_users:
+            today_logs = [log for log in teammate.exercise_logs if log.date == date.today()]
+            today_meals = [log for log in teammate.meal_logs if log.date == date.today()]
+
+            if not today_logs or not today_meals:
+                continue
+
+            total_burned = sum(log.calories_burned for log in today_logs)
+            total_eaten = sum(log.meal.calories for log in today_meals)
+            net = total_eaten - total_burned
+
+            team_member_scoreboard.append({
+                "user": teammate,
+                "burned": total_burned,
+                "eaten": total_eaten,
+                "net": net
+            })
+
+        team_member_scoreboard.sort(key=lambda x: x["net"])
 
     # 🔹 Weekly calories burned chart
     today = date.today()
@@ -90,7 +105,7 @@ def dashboard():
         user_total_calories_burnt=total_calories,
         chart_data=chart_data,
         all_teams=all_teams,
-        date=date  # ✅ Needed for {{ date.today().isoformat() }} in form
+        date=date
     )
 
 
@@ -111,22 +126,31 @@ def refresh_scoreboard():
         return "Not logged in", 401
 
     user = User.query.get(user_id)
-
     if not user or not user.team:
         return render_template('partials/scoreboard.html', scoreboard=[])
 
     team_users = User.query.filter_by(team=user.team).all()
-    team_user_ids = [u.id for u in team_users]
+    scoreboard = []
 
-    if not team_user_ids:
-        return render_template('partials/scoreboard.html', scoreboard=[])
+    for teammate in team_users:
+        today_logs = [log for log in teammate.exercise_logs if log.date == date.today()]
+        today_meals = [log for log in teammate.meal_logs if log.date == date.today()]
+        if not today_logs or not today_meals:
+            continue
 
-    team_member_scoreboard = Scoreboard.query.filter(
-        Scoreboard.user_id.in_(team_user_ids),
-        Scoreboard.timestamp == date.today()
-    ).order_by(Scoreboard.total_calories_burned.desc()).all()
+        total_burned = sum(log.calories_burned for log in today_logs)
+        total_eaten = sum(log.meal.calories for log in today_meals)
+        net = total_eaten - total_burned
 
-    return render_template('partials/scoreboard.html', scoreboard=team_member_scoreboard)
+        scoreboard.append({
+            "user": teammate,
+            "burned": total_burned,
+            "eaten": total_eaten,
+            "net": net
+        })
+
+    scoreboard.sort(key=lambda x: x["net"])
+    return render_template('partials/scoreboard.html', scoreboard=scoreboard)
 
 
 @app.route('/update_team', methods=['POST'])
@@ -152,3 +176,37 @@ def update_team():
         flash(f"You've joined the team: {cleaned_team}", "success")
 
     return redirect(url_for('dashboard'))
+
+
+@app.route('/user/<int:user_id>')
+def user_detail(user_id):
+    if "user_id" not in session:
+        flash("Please log in to view user profiles.", "error")
+        return redirect(url_for("login"))
+
+    selected_user = User.query.get_or_404(user_id)
+
+    today = date.today()
+    todays_exercises = ExerciseLog.query.filter_by(user_id=selected_user.id, date=today).all()
+    todays_meals = [log for log in selected_user.meal_logs if log.date == today]
+
+    week_start = today - timedelta(days=today.weekday())
+    weekly_scores = Scoreboard.query.filter(
+        Scoreboard.user_id == selected_user.id,
+        Scoreboard.timestamp >= week_start,
+        Scoreboard.timestamp <= today
+    ).group_by(Scoreboard.timestamp).with_entities(
+        Scoreboard.timestamp,
+        func.sum(Scoreboard.total_calories_burned)
+    ).all()
+
+    week_data = {record[0].strftime('%a'): float(record[1]) for record in weekly_scores}
+    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    chart_data = [week_data.get(day, 0) for day in labels]
+
+    return render_template("user_detail.html",
+                           user=selected_user,
+                           exercise_log=todays_exercises,
+                           meal_log=todays_meals,
+                           chart_data=chart_data,
+                           date=date)

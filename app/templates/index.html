@@ -140,21 +140,14 @@
     </div>
 
   </div>
+  <br>
 
   <div style="text-align: center;">
     <button id="openShareModal" class="share-btn">Share my FitTrack</button>
-
-    <div id="shareModal" class="modal"> <!-- Share Modal: this doesnt work rn -->
-      <div class="modal-content">
-        <span id="closeShareModal" class="close-btn">&times;</span>
-        <form action="/share_snapshot" method="POST">
-          <input type="text" name="recipient_username" required placeholder="Enter username">
-          <button type="submit" class="share-btn">Share</button>
-        </form>
-      </div>
-    </div>
+    {% include 'partials/share_modal.html' %}
   </div>
-
+  
+ 
 
 </main>
 

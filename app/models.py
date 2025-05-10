@@ -62,3 +62,9 @@ class MealLog(db.Model):
     date = db.Column(db.Date, default=date.today)
 
     meal = db.relationship('Meal')
+    
+class Share(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id_sender = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id_receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.Date, default=date.today)

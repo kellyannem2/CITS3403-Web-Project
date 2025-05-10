@@ -50,9 +50,12 @@ class User(db.Model):
 
     # Relationships
     exercises = db.relationship('Exercise', backref='user', lazy=True)
-    meals = db.relationship('Meal', backref='user', lazy=True)
     exercise_logs = db.relationship('ExerciseLog', backref='user', lazy=True)
     meal_logs = db.relationship('MealLog', backref='user', lazy=True)
+
+    @property
+    def meals(self):
+        return [log.food for log in self.meal_logs]
 
 class Scoreboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)

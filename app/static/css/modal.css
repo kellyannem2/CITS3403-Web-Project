@@ -58,9 +58,9 @@
     transition: background .2s;
   }
   .modal-tabs button.active {
-    background: #007bff;      /* active bg */
+    background: #6200ee;      /* active bg */
     color: #fff;              /* active text */
-    border-color: #007bff;
+    border-color: #6200ee;
   }
   
   /* Panel show/hide */
@@ -78,7 +78,7 @@
   }
   .modal-content input:focus,
   .modal-content select:focus {
-    border-color: #007bff;
+    border-color: #6200ee;
     outline: none;
   }
   
@@ -86,7 +86,7 @@
   .modal-submit {
     width: 100%;
     padding: .75rem;
-    background: #007bff;
+    background: #6200ee;
     color: #fff;
     border: none;
     border-radius: .25rem;
@@ -103,14 +103,14 @@
   margin: 0.5rem 0;
   padding: 0.5rem 1rem;
   background: #fff;
-  border: 1px solid #007bff;
-  color: #007bff;
+  border: 1px solid #6200ee;
+  color: #6200ee;
   border-radius: 0.25rem;
   cursor: pointer;
   transition: background .2s, color .2s;
 }
 .search-btn:hover {
-  background: #007bff;
+  background: #6200ee;
   color: #fff;
 }
 
@@ -130,10 +130,10 @@
 }
 .food-item:hover {
   background: #f0f8ff;
-  border-color: #007bff;
+  border-color: #6200ee;
 }
 .food-item.selected {
-  background: #007bff;
+  background: #6200ee;
   border-color: #0056b3;
   color: #fff;
 }

@@ -71,9 +71,9 @@
     </p>
   </main>
 
-  <!-- Calorie‐entry Modal (now matches index.html) -->
+  <!-- Calorie‐entry Modal  -->
 <div id="mealModal" class="modal-overlay">
-  <form method="post" novalidate class="modal-content">
+  <form method="post" action="{{ url_for('calorie_counter') }}" class="modal-content">
     {{ form.hidden_tag() }}
     {{ form.selected_food_id() }}
     {{ form.selected_food_cal() }}
@@ -81,6 +81,7 @@
     <button id="closeMealModalBtn" class="modal-close">&times;</button>
     <h3>Add a Meal</h3>
 
+    <!-- Tabs -->
     <div class="modal-tabs">
       <button type="button" id="chooseFoodTabBtn" class="active">
         Choose a Food
@@ -90,36 +91,29 @@
       </button>
     </div>
 
-    <!-- CHOOSE A FOOD -->
-    <div id="chooseFoodTab" class="tab-panel active">
-      <label for="{{ form.meal_date_time.id }}">Date/Time</label>
-      {{ form.meal_date_time(class="date-picker") }}
+    <!-- Shared Date/Time picker -->
+    <label for="{{ form.meal_date_time.id }}">Date &amp; Time</label>
+    {{ form.meal_date_time(class="date-picker") }}
 
-      <label for="{{ form.search_food.id }}">{{ form.search_food.label }}</label>
+    <!-- Choose a Food panel -->
+    <div id="chooseFoodTab" class="tab-panel active">
+      <label for="searchFoodInput">{{ form.search_food.label }}</label>
       {{ form.search_food(id="searchFoodInput", placeholder="Start typing…") }}
       <button type="button" id="searchFoodBtn" class="search-btn">Search</button>
-      
       <div id="foodResults"></div>
-
-      {{ form.submit_choose(id="submitChooseBtn", class_="modal-submit", disabled=True) }}
+      {{ form.submit_choose(id='submitChooseBtn', class_='modal-submit', disabled=True) }}
     </div>
 
-    <!-- INPUT YOUR OWN -->
+    <!-- Input Your Own panel -->
     <div id="inputOwnTab" class="tab-panel">
-      <label for="{{ form.meal_date_time.id }}">Date/Time</label>
-      {{ form.meal_date_time(class="date-picker") }}
-
       <label for="{{ form.custom_name.id }}">{{ form.custom_name.label }}</label>
-      {{ form.custom_name(class="modal-input", placeholder="e.g. Avocado toast") }}
-
+      {{ form.custom_name(class="modal-input", placeholder="Avocado toast") }}
       <label for="{{ form.custom_calories.id }}">{{ form.custom_calories.label }}</label>
-      {{ form.custom_calories(class="modal-input", placeholder="e.g. 350") }}
-
-      {{ form.submit_custom(id="submitCustomBtn", class="modal-submit") }}
+      {{ form.custom_calories(class="modal-input", placeholder="350") }}
+      {{ form.submit_custom(id='submitCustomBtn', class_='modal-submit') }}
     </div>
   </form>
 </div>
-
 
   <!-- Chart + Modal Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

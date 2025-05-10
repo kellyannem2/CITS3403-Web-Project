@@ -96,8 +96,7 @@ class MealLog(db.Model):
     food_id  = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
     date     = db.Column(db.Date,    nullable=False, default=date.today)
     
-    
-    meal = db.relationship('Meal')
+
     food = db.relationship('Food', backref=db.backref('meal_logs', lazy=True))
 
 

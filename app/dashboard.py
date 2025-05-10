@@ -1,7 +1,7 @@
 from flask import render_template, session, redirect, url_for, flash, request, jsonify, current_app
 from app import app, db
 from sqlalchemy import func
-from app.models import User, Scoreboard, ExerciseLog, MealLog
+from app.models import User, Scoreboard, ExerciseLog, MealLog, Food
 from datetime import date, timedelta
 from .forms import MealForm
 from app.usda import search_foods

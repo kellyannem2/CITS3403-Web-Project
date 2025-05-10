@@ -5,6 +5,7 @@
   <title>FitTrack Dashboard</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/fittracker_logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
 </head>
 <body>
 
@@ -107,38 +108,50 @@
     </div>
 
     <!-- Calorie Counter Column -->
-    <div class="column">
-      <div class="column-header">
-        <h2 onclick="location.href='{{ url_for('calorie_counter') }}'" style="cursor:pointer;">Calorie Counter</h2>
-        <button id="openMealModalBtn" class="add-btn" title="Add a Meal">+</button>
+      <div class="column">
+        <div class="column-header">
+          <h2
+            onclick="location.href='{{ url_for('calorie_counter') }}'"
+            style="cursor:pointer;"
+          >
+            Calorie Counter
+          </h2>
+          <button
+            id="openMealModalBtn"
+            class="add-btn"
+            title="Add a Meal"
+          >+</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Meal</th>
+              <th>Calories</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in meal_log %}
+            <tr>
+              <td>{{ log.food.name }}</td>
+              <td>{{ log.food.calories }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">No logs yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="total-summary">
+          Total: {{ total_calories }}
+        </div>
+        <h3>Weekly Calorie Intake</h3>
+        <canvas id="calorieChart" width="400" height="200"></canvas>
+        <p id="noDataMsg" style="display:none; text-align:center; color:gray;">No data for this week yet.</p>
+
+        <a
+          href="{{ url_for('calorie_counter') }}"
+          class="btn-link"
+        >View More</a>
       </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Meal</th>
-            <th>Calories</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for log in meal_logs %}
-          <tr>
-            <td>{{ log.date }}</td>
-            <td>{{ log.meal.name }}</td>
-            <td>{{ log.meal.calories }}</td>
-          </tr>
-          {% else %}
-          <tr><td colspan="3">No logs yet</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      <div class="total-summary"><span>Total: 1,650</span></div>
-      <br>
-      <h3>Weekly Calorie Intake</h3>
-      <canvas id="dashboardCalorieChart" width="400" height="200"></canvas>
-      <a href="{{ url_for('calorie_counter') }}" class="btn-link">View More</a>
-    </div>
 
   </div>
   <br>
@@ -152,7 +165,59 @@
 
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Calorie‐entry Modal (index.html) -->
+<div id="mealModal" class="modal-overlay">
+  <form method="post" novalidate class="modal-content">
+    {{ form.hidden_tag() }}
+    {{ form.selected_food_id() }}
+    {{ form.selected_food_cal() }}
+
+    <button id="closeMealModalBtn" class="modal-close">&times;</button>
+    <h3>Add a Meal</h3>
+
+    <div class="modal-tabs">
+      <button type="button" id="chooseFoodTabBtn" class="active">
+        Choose a Food
+      </button>
+      <button type="button" id="inputOwnTabBtn">
+        Input Your Own
+      </button>
+    </div>
+
+    <!-- CHOOSE A FOOD -->
+    <div id="chooseFoodTab" class="tab-panel active">
+      <label for="{{ form.meal_date_time.id }}">Date/Time</label>
+      {{ form.meal_date_time(class="date-picker") }}
+
+      <label for="{{ form.search_food.id }}">{{ form.search_food.label }}</label>
+      {{ form.search_food(id="searchFoodInput", placeholder="Start typing…") }}
+      <button type="button" id="searchFoodBtn" class="search-btn">Search</button>
+      
+      <div id="foodResults"></div>
+
+      {{ form.submit_choose(id="submitChooseBtn", class_="modal-submit") }}
+    </div>
+
+    <!-- INPUT YOUR OWN -->
+    <div id="inputOwnTab" class="tab-panel">
+      <label for="{{ form.meal_date_time.id }}">Date/Time</label>
+      {{ form.meal_date_time(class="date-picker") }}
+
+      <label for="{{ form.custom_name.id }}">{{ form.custom_name.label }}</label>
+      {{ form.custom_name(class="modal-input", placeholder="e.g. Avocado toast") }}
+
+      <label for="{{ form.custom_calories.id }}">{{ form.custom_calories.label }}</label>
+      {{ form.custom_calories(class="modal-input", placeholder="e.g. 350") }}
+
+      {{ form.submit_custom(class="modal-submit") }}
+    </div>
+  </form>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="{{ url_for('static', filename='js/meal_modal.js') }}"></script>
 <script>
   const chartData = {{ chart_data | tojson }};
 
@@ -174,25 +239,40 @@
     }
   });
 
-  const ctxDashboardCalorie = document.getElementById('dashboardCalorieChart').getContext('2d');
-  new Chart(ctxDashboardCalorie, {
-    type: 'line',
-    data: {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      datasets: [{
-        label: 'Calorie Intake',
-        data: [2100, 2000, 2200, 2300, 2100, 1900, 2000],
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 1)',
-        fill: true,
-        tension: 0.1,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: { y: { beginAtZero: true } }
+  fetch('/api/calorie-data')
+  .then(res => res.json())
+  .then(data => {
+    const labels = data.map(d => d.label);
+    const values = data.map(d => d.calories);
+
+    if (values.every(v => v === 0)) {
+      document.getElementById("noDataMsg").style.display = "block";
     }
-  });
+
+    const ctx = document.getElementById('calorieChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Calorie Intake',
+          data: values,
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1,
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  })
+  .catch(err => console.error("Error loading chart:", err));
 </script>
 
 <footer>&copy; 2025 FitTrack. All rights reserved.</footer>

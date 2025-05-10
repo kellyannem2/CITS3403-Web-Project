@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shared Logs - FitTrack</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/fittracker_logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+  {% include 'header.html' %}
+
+  <main>
+    <div class="container">
+      <h1 style="text-align: center;">Shared Logs</h1>
+
+      <div class="column">
+        <div class="column-header">
+          <h2>Activity Feed</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Shared Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in shared_logs %}
+            <tr>
+              <td>{{ log.user_name }}</td>
+              <td>{{ log.message }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">No shared logs yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer>&copy; 2025 FitTrack. All rights reserved.</footer>
+</body>
+</html>

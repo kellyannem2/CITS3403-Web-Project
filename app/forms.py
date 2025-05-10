@@ -1,11 +1,11 @@
 # forms.py
 from flask_wtf import FlaskForm
-from wtforms import DateTimeField, StringField, IntegerField, SubmitField, HiddenField, DateTimeLocalField
+from wtforms import DateTimeLocalField, StringField, IntegerField, SubmitField, HiddenField, DateTimeLocalField
 from wtforms.validators import DataRequired, Optional
 from datetime import datetime
 
 class MealForm(FlaskForm):
-    meal_date_time = DateTimeField(
+    meal_date_time = DateTimeLocalField(
         'Date/Time',
         default=datetime.now,
         format='%Y-%m-%dT%H:%M',

@@ -124,10 +124,32 @@ body.account-page {
   box-sizing: border-box;
 }
 
+.logout-form {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+.btn-logout {
+  border: 2px solid red;
+  color: red;
+  background: transparent;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-logout:hover {
+  background: red;
+  color: white;
+}
+
 /* Buttons */
 .account-page .btn {
-  display: block;
-  width: 100%;
+  display: inline-block;
+  width: 100%;           
   padding: 0.75rem;
   font-size: 1rem;
   font-weight: 600;
@@ -137,8 +159,14 @@ body.account-page {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
-.account-page .btn:hover {
+
+.account-page .btn:hover:enabled {
   background: #5d00ff;
+}
+
+.account-page .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

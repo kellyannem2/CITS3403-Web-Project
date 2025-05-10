@@ -5,61 +5,69 @@ from app.models import User, Scoreboard, ExerciseLog, MealLog, Food
 from datetime import date, timedelta
 from .forms import MealForm
 from app.usda import search_foods
+from datetime import datetime
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
     form = MealForm()
 
-    # 1) Handle meal‐entry form submission
-    if form.validate_on_submit():
-        user_id = session.get("user_id")
-        user = User.query.get(user_id)
+    if request.method == "POST":
+        # 1) Always grab the one datetime
+        dt_str = request.form.get("meal_date_time")
+        try:
+            # parse the ISO string (flatpickr now emits “YYYY-MM-DDTHH:MM”)
+            meal_dt = datetime.fromisoformat(dt_str)
+        except Exception:
+            flash("Invalid date/time format.", "error")
+            return redirect(url_for("dashboard"))
 
-        # Normalize the datetime
-        meal_dt = form.meal_date_time.data
+        # 2) Branch on which button was clicked
+        if "submit_choose" in request.form:
+            # Search tab
+            food_id = request.form.get("selected_food_id")
+            if not food_id:
+                flash("Please pick a food from the search results.", "warning")
+                return redirect(url_for("dashboard"))
 
-        if form.submit_choose.data:
-            # User picked from search
-            food = Food.query.filter_by(name=form.search_food.data).first()
+            food = Food.query.get(food_id)
             if not food:
-                flash(f"Food “{form.search_food.data}” not found.", "error")
-                return redirect(url_for('dashboard'))
-        else:
-            # User entered a custom item
-            # Create a new Food record
-            food = Food(
-                name=form.custom_name.data,
-                calories=form.custom_calories.data,
-                serving_size="(custom)"
-            )
-            db.session.add(food)
-            db.session.flush()  # assign food.id
+                flash("That food isn’t in our database any more—please search again.", "error")
+                return redirect(url_for("dashboard"))
 
-        # Create the MealLog
-        new_log = MealLog(
-            user_id=user.id,
-            food_id=food.id,
-            date=meal_dt
-        )
+        elif "submit_custom" in request.form:
+            # Custom tab
+            name = request.form.get("custom_name","").strip()
+            cal  = request.form.get("custom_calories","").strip()
+            if not name or not cal.isdigit():
+                flash("Provide both a name (text) and calories (number).", "warning")
+                return redirect(url_for("dashboard"))
+
+            food = Food(name=name, calories=int(cal), serving_size="(custom)")
+            db.session.add(food)
+            db.session.flush()
+
+        else:
+            flash("Unknown action.", "error")
+            return redirect(url_for("dashboard"))
+
+        # 3) Log it
+        new_log = MealLog(user_id=session["user_id"], food_id=food.id, date=meal_dt)
         db.session.add(new_log)
         db.session.commit()
 
-        flash(
-            f"Added “{food.name}” — {food.calories} cal @ {meal_dt}",
-            "success"
-        )
-        return redirect(url_for('dashboard'))
-    
-    
+        flash(f"Logged “{food.name}” – {food.calories} cal @ {meal_dt}", "success")
+        return redirect(url_for("dashboard"))
+
+    # 2) GET or invalid POST: render dashboard
     user_id = session.get("user_id")
     if not user_id:
-        flash("You are not logged in. Please log in to access the dashboard.", "error")
+        flash("Please log in first.", "error")
         return redirect(url_for("login"))
 
     user = User.query.get(user_id)
     if not user:
-        flash("User not found.", "error")
         session.pop("user_id", None)
+        flash("User not found, please log in again.", "error")
         return redirect(url_for("login"))
 
     # 🔹 Total calories burned today
@@ -138,12 +146,11 @@ def dashboard():
     week_data = {record[0].strftime('%a'): float(record[1]) for record in weekly_results}
     labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     chart_data = [week_data.get(day, 0) for day in labels]
-
+    
     return render_template("index.html",
         user=user,
         form=form,
         exercise=user.exercises,
-        meal=user.meals,
         exercise_log=todays_exercises,
         meal_log=user.meal_logs,
         scoreboard=team_member_scoreboard,
@@ -153,43 +160,90 @@ def dashboard():
         date=date
     )
 
-
-@app.route('/calorie-counter')
+@app.route("/calorie-counter", methods=["GET", "POST"])
 def calorie_counter():
+    # Must be logged in
     user_id = session.get("user_id")
     if not user_id:
         flash("Please log in to view your meals.", "error")
-        return redirect(url_for("auth.login"))
-    
-    form = MealForm()
+        return redirect(url_for("login"))
 
-    # Parse optional ?week= offset from URL
+    # Handle form POST
+    if request.method == "POST":
+        # 1) Parse datetime
+        raw_dt = request.form.get("meal_date_time", "")
+        try:
+            meal_dt = datetime.fromisoformat(raw_dt)
+        except Exception:
+            flash("Invalid date/time format.", "error")
+            return redirect(url_for("calorie_counter"))
+
+        # 2) Branch on which button
+        if "submit_choose" in request.form:
+            food_id = request.form.get("selected_food_id")
+            if not food_id:
+                flash("Please pick a food from the search results.", "warning")
+                return redirect(url_for("calorie_counter"))
+            food = Food.query.get(food_id)
+            if not food:
+                flash("That food isn’t in our database—please search again.", "error")
+                return redirect(url_for("calorie_counter"))
+
+        elif "submit_custom" in request.form:
+            name = request.form.get("custom_name", "").strip()
+            cal  = request.form.get("custom_calories", "").strip()
+            if not name or not cal.isdigit():
+                flash("Provide both a name and calories.", "warning")
+                return redirect(url_for("calorie_counter"))
+            food = Food(name=name, calories=int(cal), serving_size="(custom)")
+            db.session.add(food)
+            db.session.flush()
+
+        else:
+            flash("Unknown action.", "error")
+            return redirect(url_for("calorie_counter"))
+
+        # 3) Log it
+        new_log = MealLog(user_id=user_id, food_id=food.id, date=meal_dt)
+        db.session.add(new_log)
+        db.session.commit()
+        flash(f"Logged “{food.name}” — {food.calories} cal @ {meal_dt}", "success")
+        return redirect(url_for("calorie_counter"))
+
+    # GET: show the page
+    # (copy your existing week-nav & query logic here)
     try:
         week_offset = int(request.args.get("week", 0))
     except ValueError:
         week_offset = 0
 
-    today = date.today()
+    today         = date.today()
     start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
-    end_of_week = start_of_week + timedelta(days=6)
+    end_of_week   = start_of_week + timedelta(days=6)
 
-    meals = MealLog.query.filter(
-        MealLog.user_id == user_id,
-        MealLog.date >= start_of_week,
-        MealLog.date <= end_of_week
-    ).order_by(MealLog.date.desc()).all()
-
+    meals = (
+        MealLog.query
+        .filter(
+            MealLog.user_id == user_id,
+            MealLog.date >= start_of_week,
+            MealLog.date <= end_of_week
+        )
+        .order_by(MealLog.date.desc())
+        .all()
+    )
     total_cals = sum(log.food.calories for log in meals if log.food)
+
+    form = MealForm()
 
     return render_template(
         'calorie_counter.html',
         form=form,
         meal_log=meals,
         total_calories=total_cals,
-        date=date,
         week_offset=week_offset,
         start_of_week=start_of_week,
-        end_of_week=end_of_week
+        end_of_week=end_of_week,
+        date=date
     )
 
 
@@ -314,7 +368,6 @@ def get_calorie_data():
             "label": day.strftime('%a'),
             "calories": total
         })
-
     return data
 
 @app.route('/api/foods')

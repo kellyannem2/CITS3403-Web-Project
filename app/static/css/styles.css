@@ -322,3 +322,8 @@
 .share-btn:hover {
   background-color: #4500b5;
 }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

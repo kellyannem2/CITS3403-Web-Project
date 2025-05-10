@@ -25,6 +25,11 @@ migrate = Migrate(app, db)
 from app import auth, reset_pass, dashboard, exercise_log  # ✅ <- added exercise_log route file
 from app.models import User  # ✅ <- any models you define will be created below
 
+from .forms import MealForm
+def inject_meal_form():
+    # Now every render_template will have a `form` var available
+    return dict(form=MealForm())
+
 # --- DB Initialization ---
 with app.app_context():
     db.create_all()

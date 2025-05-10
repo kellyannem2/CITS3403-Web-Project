@@ -164,6 +164,23 @@ def settings():
                 flash('Password updated successfully!', 'success')
 
             return redirect(url_for('account'))
+        # === USDA API KEY ===
+        elif action == 'update_usda_key':
+            current_pw = request.form.get('current_password', '')
+            new_key    = request.form.get('usda_api_key', '').strip() or None
+
+            # verify the current password
+            if not check_password_hash(user.password, current_pw):
+                flash('Current password is incorrect.', 'error')
+            else:
+                user.usda_api_key = new_key
+                db.session.commit()
+                if new_key:
+                    flash('USDA API key updated successfully!', 'success')
+                else:
+                    flash('USDA API key cleared.', 'info')
+
+            return redirect(url_for('account'))
 
     return render_template('account.html', user=user)
 

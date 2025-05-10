@@ -1,12 +1,56 @@
-from flask import render_template, session, redirect, url_for, flash, request
+from flask import render_template, session, redirect, url_for, flash, request, jsonify, current_app
 from app import app, db
 from sqlalchemy import func
 from app.models import User, Scoreboard, ExerciseLog, MealLog
 from datetime import date, timedelta
-
+from .forms import MealForm
+from app.usda import search_foods
 
 @app.route("/dashboard")
 def dashboard():
+    form = MealForm()
+
+    # 1) Handle meal‐entry form submission
+    if form.validate_on_submit():
+        user_id = session.get("user_id")
+        user = User.query.get(user_id)
+
+        # Normalize the datetime
+        meal_dt = form.meal_date_time.data
+
+        if form.submit_choose.data:
+            # User picked from search
+            food = Food.query.filter_by(name=form.search_food.data).first()
+            if not food:
+                flash(f"Food “{form.search_food.data}” not found.", "error")
+                return redirect(url_for('dashboard'))
+        else:
+            # User entered a custom item
+            # Create a new Food record
+            food = Food(
+                name=form.custom_name.data,
+                calories=form.custom_calories.data,
+                serving_size="(custom)"
+            )
+            db.session.add(food)
+            db.session.flush()  # assign food.id
+
+        # Create the MealLog
+        new_log = MealLog(
+            user_id=user.id,
+            food_id=food.id,
+            date=meal_dt
+        )
+        db.session.add(new_log)
+        db.session.commit()
+
+        flash(
+            f"Added “{food.name}” — {food.calories} cal @ {meal_dt}",
+            "success"
+        )
+        return redirect(url_for('dashboard'))
+    
+    
     user_id = session.get("user_id")
     if not user_id:
         flash("You are not logged in. Please log in to access the dashboard.", "error")
@@ -97,6 +141,7 @@ def dashboard():
 
     return render_template("index.html",
         user=user,
+        form=form,
         exercise=user.exercises,
         meal=user.meals,
         exercise_log=todays_exercises,
@@ -111,7 +156,41 @@ def dashboard():
 
 @app.route('/calorie-counter')
 def calorie_counter():
-    return render_template('calorie_counter.html')
+    user_id = session.get("user_id")
+    if not user_id:
+        flash("Please log in to view your meals.", "error")
+        return redirect(url_for("auth.login"))
+    
+    form = MealForm()
+
+    # Parse optional ?week= offset from URL
+    try:
+        week_offset = int(request.args.get("week", 0))
+    except ValueError:
+        week_offset = 0
+
+    today = date.today()
+    start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
+    end_of_week = start_of_week + timedelta(days=6)
+
+    meals = MealLog.query.filter(
+        MealLog.user_id == user_id,
+        MealLog.date >= start_of_week,
+        MealLog.date <= end_of_week
+    ).order_by(MealLog.date.desc()).all()
+
+    total_cals = sum(log.food.calories for log in meals if log.food)
+
+    return render_template(
+        'calorie_counter.html',
+        form=form,
+        meal_log=meals,
+        total_calories=total_cals,
+        date=date,
+        week_offset=week_offset,
+        start_of_week=start_of_week,
+        end_of_week=end_of_week
+    )
 
 
 @app.route('/leaderboard')
@@ -210,3 +289,82 @@ def user_detail(user_id):
                            meal_log=todays_meals,
                            chart_data=chart_data,
                            date=date)
+
+@app.route('/api/calorie-data')
+def get_calorie_data():
+    user_id = session.get("user_id")
+    if not user_id:
+        return {"error": "Not logged in"}, 401
+
+    # Get week offset from URL (same logic as exercise_log)
+    try:
+        week_offset = int(request.args.get("week", 0))
+    except ValueError:
+        week_offset = 0
+
+    today = date.today()
+    start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
+    days = [start_of_week + timedelta(days=i) for i in range(7)]
+
+    data = []
+    for day in days:
+        logs = MealLog.query.filter_by(user_id=user_id, date=day).all()
+        total = sum(log.food.calories for log in logs if log.food)
+        data.append({
+            "label": day.strftime('%a'),
+            "calories": total
+        })
+
+    return data
+
+@app.route('/api/foods')
+def foods_search():
+    q = request.args.get('q', '').strip()
+    if len(q) < 2:
+        return jsonify([])
+
+    # 1) Local DB search
+    local = (
+        Food.query
+        .filter(Food.name.ilike(f"%{q}%"))
+        .limit(10)
+        .all()
+    )
+    results = [{
+        'id':       f.id,
+        'name':     f.name,
+        'calories': f.calories,
+        'serving':  f.serving_size
+    } for f in local]
+
+    # 2) Determine if we have a USDA key to use
+    api_key = None
+    # check per‐user key
+    user_id = session.get('user_id')
+    if user_id:
+        user = User.query.get(user_id)
+        api_key = user.usda_api_key
+    # fallback to global
+    if not api_key:
+        api_key = current_app.config.get('FDC_API_KEY')
+
+    # 3) Only call USDA if we still want more AND we have a key
+    if api_key and len(results) < 10:
+        # Temporarily inject the key into the USDA client
+        # (or modify search_foods to accept a key param)
+        current_app.config['FDC_API_KEY'] = api_key
+        usda_hits = search_foods(q, page_size=10 - len(results))
+        for item in usda_hits:
+            calories = next(
+                (nut['value'] for nut in item.get('foodNutrients', [])
+                 if nut.get('nutrientName') == "Energy"),
+                None
+            )
+            results.append({
+                'fdcId':     item['fdcId'],
+                'name':      item['description'],
+                'calories':  calories,
+                'serving':   item.get('servingSizeUnit', '100 g')
+            })
+
+    return jsonify(results)

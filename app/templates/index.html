@@ -146,7 +146,7 @@
 
   </div>
   <br>
-
+</ul>
   <div style="text-align: center;">
     <button id="openShareModal" class="share-btn">Share my FitTrack</button>
     {% include 'partials/share_modal.html' %}
@@ -156,9 +156,9 @@
 
 </main>
 
-<!-- Calorie‐entry Modal (index.html) -->
+<!-- Calorie‐entry Modal -->
 <div id="mealModal" class="modal-overlay">
-  <form method="post" novalidate class="modal-content">
+  <form method="post" action="{{ url_for('dashboard') }}" class="modal-content">
     {{ form.hidden_tag() }}
     {{ form.selected_food_id() }}
     {{ form.selected_food_cal() }}
@@ -166,6 +166,7 @@
     <button id="closeMealModalBtn" class="modal-close">&times;</button>
     <h3>Add a Meal</h3>
 
+    <!-- 1) Tabs at the very top -->
     <div class="modal-tabs">
       <button type="button" id="chooseFoodTabBtn" class="active">
         Choose a Food
@@ -175,35 +176,42 @@
       </button>
     </div>
 
-    <!-- CHOOSE A FOOD -->
-    <div id="chooseFoodTab" class="tab-panel active">
-      <label for="{{ form.meal_date_time.id }}">Date/Time</label>
+    <!-- 2) Shared Date/Time picker just below the tabs -->
+    <div class="form-group">
+      <label for="{{ form.meal_date_time.id }}">Date &amp; Time</label>
       {{ form.meal_date_time(class="date-picker") }}
-
-      <label for="{{ form.search_food.id }}">{{ form.search_food.label }}</label>
-      {{ form.search_food(id="searchFoodInput", placeholder="Start typing…") }}
-      <button type="button" id="searchFoodBtn" class="search-btn">Search</button>
-      
-      <div id="foodResults"></div>
-
-      {{ form.submit_choose(id="submitChooseBtn", class_="modal-submit") }}
     </div>
 
-    <!-- INPUT YOUR OWN -->
-    <div id="inputOwnTab" class="tab-panel">
-      <label for="{{ form.meal_date_time.id }}">Date/Time</label>
-      {{ form.meal_date_time(class="date-picker") }}
+    <!-- 3a) CHOOSE A FOOD panel -->
+    <div id="chooseFoodTab" class="tab-panel active">
+      <label for="searchFoodInput">{{ form.search_food.label }}</label>
+      {{ form.search_food(id="searchFoodInput", placeholder="Start typing…") }}
+      <button type="button" id="searchFoodBtn" class="search-btn">Search</button>
+      <div id="foodResults"></div>
 
+      {{ form.submit_choose(
+           id='submitChooseBtn',
+           class_='modal-submit',
+           disabled=True
+      ) }}
+    </div>
+
+    <!-- 3b) INPUT YOUR OWN panel -->
+    <div id="inputOwnTab" class="tab-panel">
       <label for="{{ form.custom_name.id }}">{{ form.custom_name.label }}</label>
       {{ form.custom_name(class="modal-input", placeholder="e.g. Avocado toast") }}
 
       <label for="{{ form.custom_calories.id }}">{{ form.custom_calories.label }}</label>
       {{ form.custom_calories(class="modal-input", placeholder="e.g. 350") }}
 
-      {{ form.submit_custom(class="modal-submit") }}
+      {{ form.submit_custom(
+           id='submitCustomBtn',
+           class_='modal-submit'
+      ) }}
     </div>
   </form>
 </div>
+
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>

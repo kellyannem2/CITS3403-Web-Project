@@ -1,6 +1,25 @@
-from datetime import datetime, date
+import os
+import base64
+import secrets
+from datetime import date
+from sqlalchemy_utils import EncryptedType
+from sqlalchemy_utils.types.encrypted.encrypted_type import AesGcmEngine
 from app import db
 
+
+def _ensure_encryption_key():
+    # Look for an existing KEY in env
+    key = os.environ.get('DB_ENCRYPTION_KEY')
+    if not key:
+        # Generate 32 random bytes, then url-safe base64-encode them
+        raw_key = secrets.token_bytes(32)
+        key = base64.urlsafe_b64encode(raw_key).decode()
+        # Store it for this process
+        os.environ['DB_ENCRYPTION_KEY'] = key
+        print(f"Generated new DB_ENCRYPTION_KEY: {key}")
+    return key
+
+_ENC_KEY = _ensure_encryption_key()
 
 class User(db.Model):
     __tablename__ = "user"
@@ -19,6 +38,15 @@ class User(db.Model):
 
     email_change_token = db.Column(db.String(64), nullable=True)
     new_email_temp = db.Column(db.String(120), nullable=True)
+
+    usda_api_key = db.Column(
+        EncryptedType(
+            db.String(128),
+            _ENC_KEY,
+            AesGcmEngine
+        ),
+        nullable=True
+    )
 
     # Relationships
     exercises = db.relationship('Exercise', backref='user', lazy=True)
@@ -49,16 +77,20 @@ class ExerciseLog(db.Model):
 
     exercise = db.relationship('Exercise')
 
-class Meal(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # NULL if global
-    name = db.Column(db.String(100), nullable=False)
-    calories = db.Column(db.Float, nullable=False)
+class Food(db.Model):
+    __tablename__ = "food"
+
+    id           = db.Column(db.Integer, primary_key=True)
+    name         = db.Column(db.String(128), unique=True, index=True, nullable=False)
+    calories     = db.Column(db.Float,      nullable=False)
+    serving_size = db.Column(db.String(64), default='100 g')
 
 class MealLog(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    meal_id = db.Column(db.Integer, db.ForeignKey('meal.id'), nullable=False)
-    date = db.Column(db.Date, default=date.today)
+    __tablename__ = "meal_log"
 
-    meal = db.relationship('Meal')
+    id       = db.Column(db.Integer, primary_key=True)
+    user_id  = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    food_id  = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
+    date     = db.Column(db.Date,    nullable=False, default=date.today)
+
+    food = db.relationship('Food', backref=db.backref('meal_logs', lazy=True))

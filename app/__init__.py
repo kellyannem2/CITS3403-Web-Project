@@ -22,7 +22,7 @@ mail = Mail(app)
 migrate = Migrate(app, db)
 
 # --- Import Route Files ---
-from app import auth, reset_pass, dashboard, exercise_log  # ✅ <- added exercise_log route file
+from app import auth, reset_pass, dashboard, exercise_log, share_page # ✅ <- added exercise_log route file
 from app.models import User  # ✅ <- any models you define will be created below
 
 from .forms import MealForm

@@ -95,5 +95,15 @@ class MealLog(db.Model):
     user_id  = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     food_id  = db.Column(db.Integer, db.ForeignKey('food.id'), nullable=False)
     date     = db.Column(db.Date,    nullable=False, default=date.today)
-
+    
+    
+    meal = db.relationship('Meal')
     food = db.relationship('Food', backref=db.backref('meal_logs', lazy=True))
+
+
+class Share(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id_sender = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id_receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.Date, default=date.today)
+

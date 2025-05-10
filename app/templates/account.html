@@ -22,6 +22,11 @@
         <img src="{{ url_for('static', filename=user.profile_img or 'images/avatar.webp') }}" alt="Profile avatar" class="avatar">
       </label>
     </form>
+    
+    <!-- Logout Button -->
+    <form action="{{ url_for('logout') }}" method="POST" onsubmit="return confirm('Are you sure you want to log out?')" class="logout-form">
+      <button type="submit" class="btn-logout">Logout</button>
+    </form>
 
     <h2 class="account-heading">My Account</h2>
 
@@ -53,7 +58,7 @@
           <label for="current_password_email">Current Password</label>
           <input type="password" id="current_password_email" name="current_password" placeholder="••••••••" required>
         </div>
-        <button type="submit" class="btn">Request Verification</button>
+        <button type="submit" class="btn" id="emailSubmitBtn" disabled>Request Verification</button>
       </form>
     </div>
 
@@ -72,7 +77,7 @@
           <label for="confirm_new_password">Confirm New Password</label>
           <input type="password" id="confirm_new_password" name="confirm_password" placeholder="••••••••" required>
         </div>
-        <button type="submit" class="btn">Save Password</button>
+        <button type="submit" class="btn" id="passwordSubmitBtn" disabled>Save Password</button>
       </form>
     </div>
 
@@ -96,7 +101,7 @@
                  placeholder="••••••••"
                  required>
         </div>
-        <button type="submit" class="btn">Save API Key</button>
+        <button type="submit" class="btn" id="usdaSubmitBtn" disabled>Save API Key</button>
       </form>
     </div>
 
@@ -106,7 +111,8 @@
 
 {% block scripts %}
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', () => {
+    // === TAB SWITCHING ===
     document.querySelectorAll('.tab-link').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
@@ -115,6 +121,35 @@
         document.getElementById(tab.dataset.tab).classList.add('active');
       });
     });
+
+    // === FORM VALIDATION ===
+    const checkFormValidity = (form, button) => {
+      button.disabled = !form.checkValidity();
+    };
+
+    // Email form
+    const emailForm = document.querySelector('#tab-email form');
+    const emailButton = document.querySelector('#emailSubmitBtn');
+    emailForm.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', () => checkFormValidity(emailForm, emailButton));
+    });
+    checkFormValidity(emailForm, emailButton);
+
+    // Password form
+    const passwordForm = document.querySelector('#tab-password form');
+    const passwordButton = document.querySelector('#passwordSubmitBtn');
+    passwordForm.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', () => checkFormValidity(passwordForm, passwordButton));
+    });
+    checkFormValidity(passwordForm, passwordButton);
+
+    // USDA API Key form
+    const usdaForm = document.querySelector('#tab-usda form');
+    const usdaButton = document.querySelector('#usdaSubmitBtn');
+    usdaForm.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', () => checkFormValidity(usdaForm, usdaButton));
+    });
+    checkFormValidity(usdaForm, usdaButton);
   });
 </script>
 {% endblock %}

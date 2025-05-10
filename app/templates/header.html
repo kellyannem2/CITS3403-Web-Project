@@ -13,6 +13,9 @@
   }
   /* Header styling */
   header.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     position: sticky; /* allow header to sit within background image */
     top: 0;
     left: 0;
@@ -36,6 +39,9 @@
     align-items: center;
   }
   .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-family: 'Montserrat', sans-serif;
     font-size: 1.5rem;
     font-weight: 600;
@@ -73,8 +79,12 @@
 </style>
 
 <header class="main-header">
-  <div class="header-inner">
-    <a href="{{ url_for('dashboard') }}" class="logo">FitTrack</a>
+  <div class="logo">
+    <a href="{{ url_for('dashboard') }}" style="display: flex; align-items: center; text-decoration: none;">
+      <img src="{{ url_for('static', filename='images/fittracker_logo.png') }}" alt="FitTrack Logo" style="height: 40px; margin-right: 10px;">
+      <span style="font-size: 24px; font-weight: bold; color: #333;">FitTrack</span>
+    </a>
+  </div>
     <nav>
       <ul class="nav-links">
         <li><a href="{{ url_for('dashboard') }}" class="active">Dashboard</a></li>

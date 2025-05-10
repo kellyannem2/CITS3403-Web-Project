@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>FitTrack Dashboard</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/fittracker_logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
@@ -57,6 +58,7 @@
       </table>
 
       <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
+      <br>
       <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
     </div>
 
@@ -98,7 +100,7 @@
       <div class="total-summary">
         <span>Total: {{ user_total_calories_burnt }} cal</span>
       </div>
-
+      <br>
       <h3>Weekly Calories Burned</h3>
       <canvas id="dashboardExerciseChart" width="400" height="200"></canvas>
       <a href="{{ url_for('exercise_log') }}" class="btn-link">View More</a>
@@ -132,12 +134,22 @@
       </table>
 
       <div class="total-summary"><span>Total: 1,650</span></div>
+      <br>
       <h3>Weekly Calorie Intake</h3>
       <canvas id="dashboardCalorieChart" width="400" height="200"></canvas>
       <a href="{{ url_for('calorie_counter') }}" class="btn-link">View More</a>
     </div>
 
   </div>
+  <br>
+
+  <div style="text-align: center;">
+    <button id="openShareModal" class="share-btn">Share my FitTrack</button>
+    {% include 'partials/share_modal.html' %}
+  </div>
+  
+ 
+
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

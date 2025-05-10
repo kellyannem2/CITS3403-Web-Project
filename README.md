@@ -105,6 +105,17 @@ A fitness tracker web app for logging meals, tracking exercises, and sharing you
    ```
 
 ---
+### 🔑 USDA API Key (Optional, but recommended)
+
+To use the food database search feature:
+
+1. Go to [https://fdc.nal.usda.gov/api-key-signup.html](https://fdc.nal.usda.gov/api-key-signup.html)
+2. Sign up with your email address to generate a **free API key**
+3. Once you receive the key:
+   - Log in to your FitTrack account
+   - Navigate to **My Account > USDA API Key**
+   - Enter the key and your current password
+   - Save changes — the key is encrypted before being stored
 
 ---
 

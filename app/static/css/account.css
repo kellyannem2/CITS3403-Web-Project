@@ -93,7 +93,7 @@ body.account-page {
   transition: background 0.2s, color 0.2s;
 }
 .account-page .tab-link.active {
-  background: #007bff;
+  background: #5d00ff;
   color: #fff;
 }
 
@@ -132,7 +132,7 @@ body.account-page {
   font-size: 1rem;
   font-weight: 600;
   text-align: center;
-  background: #007bff;
+  background: #5d00ff;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -140,5 +140,5 @@ body.account-page {
   transition: background 0.2s;
 }
 .account-page .btn:hover {
-  background: #0056b3;
+  background: #5d00ff;
 }

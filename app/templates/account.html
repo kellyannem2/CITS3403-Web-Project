@@ -75,6 +75,30 @@
       </form>
     </div>
 
+        <!-- 3. USDA API Key -->
+    <div id="tab-usda" class="tab-content">
+      <form action="{{ url_for('settings') }}" method="POST">
+        <input type="hidden" name="action" value="update_usda_key">
+        <div class="form-group">
+          <label for="usda_api_key">USDA  API Key</label>
+          <input type="text"
+                 id="usda_api_key"
+                 name="usda_api_key"
+                 value="{{ user.usda_api_key or '' }}"
+                 placeholder="Enter your USDA API key">
+        </div>
+        <div class="form-group">
+          <label for="current_password_usda">Current Password</label>
+          <input type="password"
+                 id="current_password_usda"
+                 name="current_password"
+                 placeholder="••••••••"
+                 required>
+        </div>
+        <button type="submit" class="btn">Save API Key</button>
+      </form>
+    </div>
+
   </div>
 </div>
 {% endblock %}

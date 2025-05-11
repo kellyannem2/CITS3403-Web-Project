@@ -53,9 +53,19 @@ class User(db.Model):
     exercise_logs = db.relationship('ExerciseLog', backref='user', lazy=True)
     meal_logs = db.relationship('MealLog', backref='user', lazy=True)
 
-    @property
-    def meals(self):
-        return [log.food for log in self.meal_logs]
+    shared_logs = db.relationship('Share', 
+    foreign_keys='Share.user_id_sender',
+    backref='sender',
+    lazy=True)
+
+received_logs = db.relationship('Share',
+    foreign_keys='Share.user_id_receiver',
+    backref='receiver',
+    lazy=True)
+
+@property
+def meals(self):
+    return [log.food for log in self.meal_logs]
 
 class Scoreboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -250,6 +250,18 @@ def logout():
 
 @app.route("/share_snapshot", methods=["POST"])
 def share_snapshot():
-    sender_id = session['user_id']
-    receiver_username = request.form['recipient_username']
-    receiver = User.query.filter_by(username=receiver_username).first()
+    sender_id = session.get('user_id')
+    recipient_username = request.form.get("recipient_username")
+    receiver = User.query.filter_by(username=recipient_username).first()
+
+    if not receiver:
+        flash("User not found.", "danger")
+        return redirect(url_for("dashboard"))
+
+    new_share = Share(user_id_sender=sender_id, user_id_receiver=receiver.id)
+    db.session.add(new_share)
+    db.session.commit()
+
+    flash("FitTrack shared successfully!", "success")
+    return redirect(url_for("dashboard"))
+

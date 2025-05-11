@@ -118,7 +118,7 @@ def dashboard():
                 continue
 
             total_burned = sum(log.calories_burned for log in today_logs)
-            total_eaten = sum(log.meal.calories for log in today_meals)
+            total_eaten = sum(log.food.calories for log in today_meals)
             net = total_eaten - total_burned
 
             team_member_scoreboard.append({
@@ -153,6 +153,7 @@ def dashboard():
         exercise=user.exercises,
         exercise_log=todays_exercises,
         meal_log=user.meal_logs,
+        total_eaten=total_eaten,
         scoreboard=team_member_scoreboard,
         user_total_calories_burnt=total_calories,
         chart_data=chart_data,

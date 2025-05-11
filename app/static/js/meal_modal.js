@@ -11,14 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput      = document.getElementById('searchFoodInput');
   const searchBtn        = document.getElementById('searchFoodBtn');
   const resultsDiv       = document.getElementById('foodResults');
-  const submitChooseBtn  = document.getElementById('submitChooseBtn');  // ← grab it now
+  const submitChooseBtn  = document.getElementById('submitChooseBtn');
+
+  // Custom tab inputs
+  const customNameInput     = document.querySelector('input[name="custom_name"]');
+  const customCaloriesInput = document.querySelector('input[name="custom_calories"]');
 
   // ─── Initialize Flatpickr ─────────────────────────────────────────────────
   if (window.flatpickr) {
     flatpickr('.date-picker', {
-      enableTime:    true,
-      dateFormat:    'Y-m-d H:i',
-      defaultDate:   new Date(),
+      enableTime:      true,
+      dateFormat:      'Y-m-d\\TH:i',  // emit 2025-05-10T19:46
+      defaultDate:     new Date(),
       minuteIncrement: 1
     });
   }
@@ -29,48 +33,64 @@ document.addEventListener('DOMContentLoaded', () => {
   // ─── Modal Open/Close ─────────────────────────────────────────────────────
   openBtn.addEventListener('click', () => {
     modal.classList.add('show');
-    chooseTabBtn.click();  // reset to the first tab
-    // reset pickers
+    activateChoose();  // reset to first tab
+
+    // Reset date-picker
     document.querySelectorAll('.date-picker').forEach(dp => {
       if (dp._flatpickr) dp._flatpickr.setDate(new Date());
     });
-    submitChooseBtn.disabled = true;  // reset button
-    resultsDiv.innerHTML = '';        // clear any old results
-    searchInput.value = '';           // clear search box
+
+    // Reset state
+    submitChooseBtn.disabled = true;
+    resultsDiv.innerHTML      = '';
+    searchInput.value         = '';
   });
+
   closeBtn.addEventListener('click', () => modal.classList.remove('show'));
   modal.addEventListener('click', e => {
     if (e.target === modal) modal.classList.remove('show');
   });
 
   // ─── Tab Switching ─────────────────────────────────────────────────────────
-  function showChoose() {
+  function activateChoose() {
     chooseTabBtn.classList.add('active');
     inputTabBtn.classList.remove('active');
     choosePanel.classList.add('active');
     inputPanel.classList.remove('active');
+
+    // Disable custom fields in search mode
+    customNameInput.disabled     = true;
+    customCaloriesInput.disabled = true;
   }
-  function showInput() {
+
+  function activateInput() {
     inputTabBtn.classList.add('active');
     chooseTabBtn.classList.remove('active');
     inputPanel.classList.add('active');
     choosePanel.classList.remove('active');
+
+    // Enable custom fields in custom mode
+    customNameInput.disabled     = false;
+    customCaloriesInput.disabled = false;
   }
-  chooseTabBtn.addEventListener('click', showChoose);
-  inputTabBtn.addEventListener('click', showInput);
-  showChoose(); // default
+
+  chooseTabBtn.addEventListener('click', activateChoose);
+  inputTabBtn.addEventListener('click', activateInput);
+
+  // initialize on load
+  activateChoose();
 
   // ─── Search & Select Logic ─────────────────────────────────────────────────
   searchBtn.addEventListener('click', async () => {
     const q = searchInput.value.trim();
     if (!q) return;
-    resultsDiv.innerHTML = '<p>Searching…</p>';
-    submitChooseBtn.disabled = true;  // in case it was enabled before
+    resultsDiv.innerHTML       = '<p>Searching…</p>';
+    submitChooseBtn.disabled   = true;
 
     try {
       const res   = await fetch(`/api/foods?q=${encodeURIComponent(q)}`);
       const foods = await res.json();
-      const top5  = foods.slice(0,5);
+      const top5  = foods.slice(0, 5);
 
       if (!top5.length) {
         resultsDiv.innerHTML = '<p>No matches found.</p>';
@@ -83,19 +103,18 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `).join('');
 
-      // Attach click‐to‐select handlers
+      // Attach click-to-select
       resultsDiv.querySelectorAll('.food-item').forEach(el => {
         el.addEventListener('click', () => {
-          // clear previous selection highlight
+          // clear previous selected
           resultsDiv.querySelectorAll('.food-item.selected').forEach(x => x.classList.remove('selected'));
-          // highlight this one
           el.classList.add('selected');
 
-          // fill hidden fields
+          // populate hidden fields
           document.querySelector('input[name="selected_food_id"]').value  = el.dataset.id;
           document.querySelector('input[name="selected_food_cal"]').value = el.dataset.cal;
 
-          // reflect in input
+          // reflect in search box
           searchInput.value = el.textContent.split(' — ')[0];
 
           // enable submit

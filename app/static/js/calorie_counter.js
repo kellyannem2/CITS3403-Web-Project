@@ -6,6 +6,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const openLogModalBtn = document.getElementById("openCountModalBtn");
   const closeLogModalBtn = document.getElementById("closeCountModal");
   
+  flatpickr(".date-picker", {
+  enableTime: true,
+  dateFormat: "Y-m-d H:i",
+  });
+
   if (openCountModalBtn && countModal && closeCountModalBtn) {
     openCountModalBtn.onclick = () => {
       countModal.style.display = "block";

@@ -64,8 +64,8 @@
         <tbody>
           {% for log in meal_log %}
           <tr>
-            <td>{{ log.meal.name }}</td>
-            <td>{{ log.meal.calories }}</td>
+            <td>{{ log.food.name }}</td>
+            <td>{{ log.food.calories }}</td>
           </tr>
           {% else %}
           <tr><td colspan="2">No logs yet</td></tr>
@@ -74,7 +74,7 @@
       </table>
 
       <div class="total-summary">
-        <span>Total: {{ meal_log | sum(attribute="meal.calories") | round(2) }} cal</span>
+        <span>Total: {{ meal_log | sum(attribute="food.calories") | round(2) }} cal</span>
       </div>
 
       <h3>Weekly Calorie Intake</h3>
@@ -88,7 +88,7 @@
 
 <script>
   const burnedData = {{ chart_data | tojson }};
-  const intakeData = [ {% for log in meal_log %} {{ log.meal.calories }}, {% endfor %} ];
+  const intakeData = [ {% for log in meal_log %} {{ log.food.calories }}, {% endfor %} ];
 
   const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 

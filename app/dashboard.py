@@ -106,6 +106,7 @@ def dashboard():
     all_teams = [team[0] for team in all_teams]
 
     # 🔹 Custom Team Leaderboard: Net Calories = Eaten - Burned
+    total_eaten = 0
     team_member_scoreboard = []
     if user.team:
         team_users = User.query.filter_by(team=user.team).all()

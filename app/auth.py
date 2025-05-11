@@ -247,3 +247,9 @@ def logout():
     session.pop("user_id", None)
     flash("You have been logged out.", "success")
     return redirect(url_for("login"))
+
+@app.route("/share_snapshot", methods=["POST"])
+def share_snapshot():
+    sender_id = session['user_id']
+    receiver_username = request.form['recipient_username']
+    receiver = User.query.filter_by(username=receiver_username).first()

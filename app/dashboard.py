@@ -274,7 +274,7 @@ def refresh_scoreboard():
             continue
 
         total_burned = sum(log.calories_burned for log in today_logs)
-        total_eaten = sum(log.meal.calories for log in today_meals)
+        total_eaten = sum(log.food.calories for log in today_meals)
         net = total_eaten - total_burned
 
         scoreboard.append({

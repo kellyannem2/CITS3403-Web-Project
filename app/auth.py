@@ -265,3 +265,17 @@ def share_snapshot():
     flash("FitTrack shared successfully!", "success")
     return redirect(url_for("dashboard"))
 
+@app.route("/shared_log")
+def shared_log():
+    current_user_id = session.get('user_id')
+    shares = Share.query.filter_by(user_id_receiver=current_user_id).all()
+
+    shared_logs = []
+    for share in shares:
+        sender = User.query.get(share.user_id_sender)
+        shared_logs.append({
+            "user_name": sender.username,
+            "message": "Shared their FitTrack with you."
+        })
+
+    return render_template("share_logs.html", shared_logs=shared_logs)

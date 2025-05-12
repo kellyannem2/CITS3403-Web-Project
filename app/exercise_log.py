@@ -28,13 +28,13 @@ def add_exercise():
     # Form inputs
     default_name = request.form.get("default_exercise")
     default_minutes = request.form.get("default_minutes")
-    custom_name = request.form.get("custom_name")
+    custom_name = request.form.get("custom_name_exe")
     custom_minutes = request.form.get("custom_minutes")
-    custom_calories = request.form.get("custom_calories")
+    custom_calories = request.form.get("custom_calories_exe")
 
     try:
         # Case 1: Default exercise
-        if default_name and default_minutes:
+        if "submit_default" in request.form:
             exercise = Exercise.query.filter_by(user_id=None, name=default_name).first()
             if not exercise:
                 exercise = Exercise(name=default_name, duration_minutes=30)
@@ -45,7 +45,7 @@ def add_exercise():
             calories = duration * 8  # Estimate
 
         # Case 2: Custom exercise
-        elif custom_name and custom_minutes and custom_calories:
+        elif "submit_custom" in request.form:
             duration = float(custom_minutes)
             rate = float(custom_calories) / 30
             calories = rate * duration

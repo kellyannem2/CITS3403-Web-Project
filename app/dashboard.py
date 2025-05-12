@@ -106,6 +106,7 @@ def dashboard():
     all_teams = [team[0] for team in all_teams]
 
     # 🔹 Custom Team Leaderboard: Net Calories = Eaten - Burned
+    total_eaten = 0
     team_member_scoreboard = []
     if user.team:
         team_users = User.query.filter_by(team=user.team).all()
@@ -273,7 +274,7 @@ def refresh_scoreboard():
             continue
 
         total_burned = sum(log.calories_burned for log in today_logs)
-        total_eaten = sum(log.meal.calories for log in today_meals)
+        total_eaten = sum(log.food.calories for log in today_meals)
         net = total_eaten - total_burned
 
         scoreboard.append({

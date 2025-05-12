@@ -1,12 +1,13 @@
 <div id="shareModal" class="modal">
     <div class="modal-content">
       <span id="closeShareModal" class="close-btn">&times;</span>
-      <form action="/share_snapshot" method="POST">
-        <h2>Share Your FitTrack</h2>
-        <br>
-        <p>Enter user to share to: </p> <br>
-        <input type="text" name="recipient_username" placeholder="Enter username" required>
-        <br>
+        <form id="shareForm" action="/share_snapshot" method="POST">
+            <h2>Share Your FitTrack</h2>
+            <div class="form-group">
+                <label for="recipient_username">Recipient Username:</label>
+                <input type="text" id="recipient_username" name="recipient_username" 
+                       placeholder="Enter username" required>
+            </div>
         <button type="submit" class="share-btn">Share</button>
       </form>
     </div>

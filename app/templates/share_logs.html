@@ -24,17 +24,22 @@
             <tr>
               <th>User</th>
               <th>Shared Message</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody>
             {% for log in shared_logs %}
-            <tr>
-              <td>{{ log.user_name }}</td>
-              <td>{{ log.message }}</td>
-            </tr>
+              <tr>
+                <td>{{ log.user_name }}</td>
+                <td>
+                    <a href="{{ url_for('user_detail', user_id=log.user_id) }}">View {{ log.user_name }}'s FitTrack</a>
+                </td>
+                <td>{{ log.time }}</td>
+              </tr>
             {% else %}
-            <tr><td colspan="2">No shared logs yet.</td></tr>
+              <tr><td colspan="2">No shared logs yet.</td></tr>
             {% endfor %}
+          </tbody>
           </tbody>
         </table>
       </div>

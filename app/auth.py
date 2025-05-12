@@ -4,8 +4,9 @@ from flask_mail import Message
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import render_template, request, redirect, url_for, session, flash
 import secrets, emoji
-from app.models import User
+from app.models import User, Share
 import os
+from datetime import datetime
 
 @app.route("/")
 def root():
@@ -247,3 +248,51 @@ def logout():
     session.pop("user_id", None)
     flash("You have been logged out.", "success")
     return redirect(url_for("login"))
+
+@app.route('/share_snapshot', methods=['POST'])
+def share_snapshot():
+    user_id = session.get("user_id")
+    if not user_id:
+        flash("You must be logged in to share.", "error")
+        return redirect(url_for("login"))
+
+    recipient_username = request.form.get("recipient_username")
+    if not recipient_username:
+        flash("Please enter a username to share with.", "error")
+        return redirect(url_for("dashboard"))
+
+    sender = User.query.get(user_id)
+    recipient = User.query.filter_by(username=recipient_username).first()
+    
+
+    if not recipient:
+        flash("User not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    share = Share(
+        user_id_sender=sender.id,
+        user_id_receiver=recipient.id
+    )
+    db.session.add(share)
+    db.session.commit()
+
+    flash(f"Shared successfully with {recipient.username}!", "success")
+    return redirect(url_for("dashboard"))
+
+@app.route('/shared_logs')
+def share_logs():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+
+    shares = Share.query.filter_by(user_id_receiver=user_id).all()
+    
+    shared_logs = []
+    for share in shares:
+        sender = User.query.get(share.user_id_sender)
+        shared_logs.append({
+            'user_name': sender.username,
+            'user_id': sender.id 
+        })
+
+    return render_template('share_logs.html', shared_logs=shared_logs)

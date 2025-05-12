@@ -57,6 +57,25 @@ document.addEventListener("DOMContentLoaded", function () {
       if (event.target === mealModal) mealModal.style.display = "none";
     };
   }
+
+  const shareForm = document.getElementById("shareForm");
+    if (shareForm) {
+        shareForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            fetch('/share_snapshot', {
+                method: 'POST',
+                body: new FormData(shareForm)
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+                return response.text();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    }
 });
 
 // Initialize refresh functions on load

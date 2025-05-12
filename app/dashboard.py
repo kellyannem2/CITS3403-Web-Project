@@ -83,7 +83,7 @@ def dashboard():
         user_id=user.id,
         date=date.today()
     ).all()
-
+    today_meals = [log for log in user.meal_logs if log.date == date.today()]
     # 🔹 Scoreboard update or creation
     scoreboard_entry = Scoreboard.query.filter_by(
         user_id=user.id,

@@ -15,17 +15,16 @@
   <main>
     <h2>Leaderboard</h2> <br>
 
-    <p class="subheading">Today's scoreboard</p>
-    <!----->
+    <p class="subheading">This Week's Scoreboard:</p>
 
     <p class="subheading">Team:</p>
-    <!---->
 
     <table>
       <thead>
         <tr>
           <th>#</th>
           <th>User</th>
+          <th>Username</th>
           <th>Net Calories</th>
           <th>Exercise Calories</th>
           <th>Food Calories</th>
@@ -33,25 +32,24 @@
       </thead>
       <tbody>
         {% for entry in scoreboard %}
-<tr>
-<td>{{ loop.index }}</td>
-<td><a href="{{ url_for('user_detail', user_id=entry.user.id) }}">{{ entry.user.full_name }}</a></td>
-<td>{{ entry.net | round(2) }}</td>
-<td>{{ entry.exercise_calories | round(2) }}</td>
-<td>{{ entry.food_calories | round(2) }}</td> 
-</tr>
-{% endfor %}
-
-</main>
-
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td><a href="{{ url_for('user_detail', user_id=entry.user.id) }}">{{ entry.user.full_name }}</a></td>
+          <td>{{ entry.user.username }}</td>
+          <td>{{ entry.net | round(2) }}</td>
+          <td>{{ entry.exercise_calories | round(2) }}</td>
+          <td>{{ entry.food_calories | round(2) }}</td> 
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
 
   <script src="/static/JS/calorie_counter.js"></script>
 
+  <footer>
+    &copy; 2025 FitTrack. All rights reserved.
+  </footer>
+
 </body>
-
-
-<footer>
-  &copy; 2025 FitTrack. All rights reserved.
-</footer>
-
 </html>

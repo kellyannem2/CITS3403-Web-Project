@@ -153,7 +153,7 @@ def dashboard():
         form=form,
         exercise=user.exercises,
         exercise_log=todays_exercises,
-        meal_log=user.meal_logs,
+        meal_log=today_meals,
         total_eaten=total_eaten,
         scoreboard=team_member_scoreboard,
         user_total_calories_burnt=total_calories,

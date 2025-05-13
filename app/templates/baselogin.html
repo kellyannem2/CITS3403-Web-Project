@@ -16,11 +16,22 @@
 
   <!-- Page-specific extra CSS -->
   {% block head %}{% endblock %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          <span>{{ message }}</span>
+          <button class="flash-close" onclick="this.parentElement.remove();">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 </head>
 <body class="{% if request.endpoint in ['login', 'reset_pass', 'signup', 'usernamepassreset'] %}login{% endif %}">
   <!-- Shared Background -->
   <img src="{{ url_for('static', filename='images/login-bg.png') }}" alt="Background" class="login__bg">
-
   {% block header %}{% endblock %}
 
   {# Conditionally wrap only login/reset/signup pages #}

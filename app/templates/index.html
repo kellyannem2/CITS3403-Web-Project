@@ -41,25 +41,27 @@
         </div>
         <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
       </div>
-      <p class="subheading">Today's scoreboard</p>
+      <p class="subheading">This Week's Scoreboard:</p>
   
       <table>
         <thead>
           <tr>
             <th>#</th>
             <th>User</th>
+            <th>Username</th>
             <th>Net Calories</th>
           </tr>
         </thead>
         <tbody>
           {% for entry in scoreboard %}
-<tr>
-  <td>{{ loop.index }}</td>
-  <td><a href="{{ url_for('user_detail', user_id=entry.user.id) }}">{{ entry.user.full_name }}</a></td>
-  <td>{{ entry.net | round(2) }}</td>
-</tr>
-{% endfor %}
-
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td><a href="{{ url_for('user_detail', user_id=entry.user.id) }}">{{ entry.user.full_name }}</a></td>
+            <td>{{ entry.user.username }}</td>
+            <td>{{ entry.net | round(0) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
       </table>
 
       <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
@@ -75,7 +77,6 @@
         <div id="exerciseModal" class="modal">
           <div class="modal-content">
             <span id="closeExerciseModal" class="close-btn">&times;</span>
-            
           </div>
         </div>
         <script src="{{ url_for('static', filename='js/exercise_log.js') }}"></script>
@@ -94,7 +95,7 @@
           <tr>
             <td>{{ log.exercise.name }}</td>
             <td>{{ log.duration_minutes }} min</td>
-            <td>{{ log.calories_burned }}</td>
+            <td>{{ log.calories_burned | round(0) }}</td>
           </tr>
           {% else %}
           <tr><td colspan="3">No logs yet</td></tr>
@@ -103,7 +104,7 @@
       </table>
 
       <div class="total-summary">
-        <span>Total: {{ user_total_calories_burnt }} cal</span>
+        <span>Total: {{ user_total_calories_burnt | round(0) }} cal</span>
       </div>
       <br>
       <h3>Weekly Calories Burned</h3>
@@ -112,61 +113,47 @@
     </div>
 
     <!-- Calorie Counter Column -->
-      <div class="column">
-        <div class="column-header">
-          <h2
-            onclick="location.href='{{ url_for('calorie_counter') }}'"
-            style="cursor:pointer;"
-          >
-            Calorie Counter
-          </h2>
-          <button
-            id="openMealModalBtn"
-            class="add-btn"
-            title="Add a Meal"
-          >+</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Meal</th>
-              <th>Calories</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for log in meal_log %}
-            <tr>
-              <td>{{ log.food.name }}</td>
-              <td>{{ log.food.calories }}</td>
-            </tr>
-            {% else %}
-            <tr><td colspan="2">No logs yet</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <div class="total-summary">
-          Total: {{ total_eaten}}
-        </div>
-        <h3>Weekly Calorie Intake</h3>
-        <canvas id="calorieChart" width="400" height="200"></canvas>
-        <p id="noDataMsg" style="display:none; text-align:center; color:gray;">No data for this week yet.</p>
-
-        <a
-          href="{{ url_for('calorie_counter') }}"
-          class="btn-link"
-        >View More</a>
+    <div class="column">
+      <div class="column-header">
+        <h2 onclick="location.href='{{ url_for('calorie_counter') }}'" style="cursor:pointer;">
+          Calorie Counter
+        </h2>
+        <button id="openMealModalBtn" class="add-btn" title="Add a Meal">+</button>
       </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Meal</th>
+            <th>Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in meal_log %}
+          <tr>
+            <td>{{ log.food.name }}</td>
+            <td>{{ log.food.calories | round(0) }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="2">No logs yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="total-summary">
+        Total: {{ total_eaten | round(0) }}
+      </div>
+      <h3>Weekly Calorie Intake</h3>
+      <canvas id="calorieChart" width="400" height="200"></canvas>
+      <p id="noDataMsg" style="display:none; text-align:center; color:gray;">No data for this week yet.</p>
+      <a href="{{ url_for('calorie_counter') }}" class="btn-link">View More</a>
+    </div>
 
   </div>
   <br>
-</ul>
+
   <div style="text-align: center;">
     <button id="openShareModal" class="share-btn">Share my FitTrack</button>
     {% include 'partials/share_modal.html' %}
   </div>
-  
- 
-
 </main>
 
 <!-- Calorie‐entry Modal -->
@@ -179,37 +166,25 @@
     <button id="closeMealModalBtn" class="modal-close">&times;</button>
     <h3>Add a Meal</h3>
 
-    <!-- 1) Tabs at the very top -->
     <div class="modal-tabs">
-      <button type="button" id="chooseFoodTabBtn" class="active">
-        Choose a Food
-      </button>
-      <button type="button" id="inputOwnTabBtn">
-        Input Your Own
-      </button>
+      <button type="button" id="chooseFoodTabBtn" class="active">Choose a Food</button>
+      <button type="button" id="inputOwnTabBtn">Input Your Own</button>
     </div>
 
-    <!-- 2) Shared Date/Time picker just below the tabs -->
     <div class="form-group">
       <label for="{{ form.meal_date_time.id }}">Date &amp; Time</label>
       {{ form.meal_date_time(class="date-picker") }}
     </div>
 
-    <!-- 3a) CHOOSE A FOOD panel -->
     <div id="chooseFoodTab" class="tab-panel active">
       <label for="searchFoodInput">{{ form.search_food.label }}</label>
       {{ form.search_food(id="searchFoodInput", placeholder="Start typing…") }}
       <button type="button" id="searchFoodBtn" class="search-btn">Search</button>
       <div id="foodResults"></div>
 
-      {{ form.submit_choose(
-           id='submitChooseBtn',
-           class_='modal-submit',
-           disabled=True
-      ) }}
+      {{ form.submit_choose(id='submitChooseBtn', class_='modal-submit', disabled=True) }}
     </div>
 
-    <!-- 3b) INPUT YOUR OWN panel -->
     <div id="inputOwnTab" class="tab-panel">
       <label for="{{ form.custom_name.id }}">{{ form.custom_name.label }}</label>
       {{ form.custom_name(class="modal-input", placeholder="e.g. Avocado toast") }}
@@ -217,19 +192,15 @@
       <label for="{{ form.custom_calories.id }}">{{ form.custom_calories.label }}</label>
       {{ form.custom_calories(class="modal-input", placeholder="e.g. 350") }}
 
-      {{ form.submit_custom(
-           id='submitCustomBtn',
-           class_='modal-submit'
-      ) }}
+      {{ form.submit_custom(id='submitCustomBtn', class_='modal-submit') }}
     </div>
   </form>
 </div>
 
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="{{ url_for('static', filename='js/meal_modal.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{{ url_for('static', filename='js/meal_modal.js') }}"></script>
 <script>
   const chartData = {{ chart_data | tojson }};
 

@@ -48,11 +48,15 @@
     color: #333;
     text-decoration: none;
   }
-  .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 2rem;
+  .nav-links li a:hover {
+  color: #000;
   }
+
+  .nav-links li a.active {
+    color: #000;
+    font-weight: 700;
+  }
+
   .nav-links li a {
     font-family: 'Poppins', sans-serif;
     font-size: 0.875rem;
@@ -87,13 +91,14 @@
   </div>
     <nav>
       <ul class="nav-links">
-        <li><a href="{{ url_for('dashboard') }}" class="active">Dashboard</a></li>
-        <li><a href="{{ url_for('exercise_log') }}">Exercise Log</a></li>
-        <li><a href="{{ url_for('calorie_counter') }}">Calorie Counter</a></li>
-        <li><a href="{{ url_for('leaderboard') }}">Leaderboard</a></li>
-        <li><a href="{{ url_for('share_logs') }}">Shared Logs</a></li>
-        <li><a href="{{ url_for('account') }}">Account</a></li>
-      </ul>
+        <li><a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+        <li><a href="{{ url_for('exercise_log') }}" class="{% if request.endpoint == 'exercise_log' %}active{% endif %}">Exercise Log</a></li>
+        <li><a href="{{ url_for('calorie_counter') }}" class="{% if request.endpoint == 'calorie_counter' %}active{% endif %}">Calorie Counter</a></li>
+        <li><a href="{{ url_for('leaderboard') }}" class="{% if request.endpoint == 'leaderboard' %}active{% endif %}">Leaderboard</a></li>
+        <li><a href="{{ url_for('share_logs') }}" class="{% if request.endpoint == 'share_logs' %}active{% endif %}">Shared Logs</a></li>
+        <li><a href="{{ url_for('account') }}" class="{% if request.endpoint == 'account' or request.endpoint == 'settings' %}active{% endif %}">Account</a></li>
+</ul>
+
       <div class="menu-toggle">☰</div>
     </nav>
   </div>

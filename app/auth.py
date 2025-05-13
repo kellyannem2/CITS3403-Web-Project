@@ -26,7 +26,7 @@ def login():
             if check_password_hash(user.password, password):
                 if user.is_verified:
                     session["user_id"] = user.id
-                    flash("Logged in successfully!", "success")
+                    #flash("Logged in successfully!", "success")
                     return redirect(url_for("dashboard"))
                 else:
                     flash("User not verified. Please check your email.", "error")
@@ -243,7 +243,7 @@ def upload_avatar():
     flash('Profile picture updated!', 'success')
     return redirect(url_for('account'))
 
-@app.route("/logout")
+@app.route("/logout", methods=["GET", "POST"])
 def logout():
     session.pop("user_id", None)
     flash("You have been logged out.", "success")
@@ -292,7 +292,8 @@ def share_logs():
         sender = User.query.get(share.user_id_sender)
         shared_logs.append({
             'user_name': sender.username,
-            'user_id': sender.id 
+            'user_id': sender.id,
+            'date': share.date
         })
 
     return render_template('share_logs.html', shared_logs=shared_logs)

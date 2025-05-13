@@ -1,5 +1,3 @@
-<!-- partials/add_exercise_form.html -->
-
 <!-- Exercise Modal Trigger -->
 <button id="openExerciseModalBtn" class="add-btn" title="Add an Exercise">+</button>
 
@@ -9,81 +7,85 @@
     <span id="closeExerciseModal" class="close-btn">&times;</span>
     <form action="/add_exercise" method="POST">
 
-        <!-- Default Exercise Selection -->
-        <label for="log-date">Date:</label>
-        <input type="date" id="log-date" name="log_date" value="{{ date.today().isoformat() }}" required>
+      <!-- Default Exercise Selection -->
+      <label for="log-date">Date:</label>
+      <input type="date" id="log-date" name="log_date" value="{{ date.today().isoformat() }}" required>
 
+      <!-- Custom Exercise Section -->
+      <p style="font-weight: bold; text-align: center;">Add Your Own Exercise:</p>
+      <br>
 
-        <!-- Custom Exercise Section -->
-        <p style="font-weight: bold; text-align: center;">Add Your Own Exercise:</p>
-        <br> 
+      <!-- Input with suggestion wrapper -->
+      <div class="input-wrapper">
         <label for="custom-name">Exercise Name:</label>
-        <input type="text" id="custom-name" name="custom_name_exe">
-
-        <br><br>
-
-        <label for="custom-minutes">Minutes:</label>
-        <input type="number" id="custom-minutes" name="custom_minutes" min="1">
-
-        <br><br>
-
-        <label for="custom-calories">Estimated Calories Burned (per 30 min):</label>
-        <input type="number" id="custom-calories" name="custom_calories_exe" min="0">
-
-        <br><br>
-
-        <div style="text-align: center;">
-          <button type="submit" name = "submit_custom">Add Exercise</button>
-        </div>
-        </form>
+        <input type="text" id="custom-name" name="custom_name_exe" class="modal-input" placeholder="e.g. Running">
+        <!-- Suggestions will appear here -->
       </div>
-      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    </div>
+      <br>
 
-    
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-          const nameInput = document.getElementById("custom-name");
-          const minutesInput = document.getElementById("custom-minutes");
-          const caloriesInput = document.getElementById("custom-calories");
-          
-          const suggestionBox = document.createElement("div");
-          suggestionBox.setAttribute("id", "exercise-suggestions");
-          suggestionBox.classList.add("autocomplete-suggestions");
-          nameInput.parentNode.appendChild(suggestionBox);
-      
-          nameInput.addEventListener("input", () => {
-              const query = nameInput.value.trim();
-              if (query.length < 2) {
-                  suggestionBox.innerHTML = "";
-                  return;
-              }
-      
-              fetch(`/search_exercises?q=${encodeURIComponent(query)}`)
-                  .then(response => response.json())
-                  .then(data => {
-                      suggestionBox.innerHTML = "";
-                      data.forEach(item => {
-                          const option = document.createElement("div");
-                          option.classList.add("suggestion");
-                          option.textContent = item.name;
-                          option.onclick = () => {
-                              nameInput.value = item.name;
-                              minutesInput.value = item.duration;
-                              caloriesInput.value = item.calories;
-                              suggestionBox.innerHTML = "";
-                          };
-                          suggestionBox.appendChild(option);
-                      });
-                  });
+      <label for="custom-minutes">Minutes:</label>
+      <input type="number" id="custom-minutes" name="custom_minutes" min="1" class="modal-input">
+
+      <br><br>
+
+      <label for="custom-calories">Estimated Calories Burned (per 30 min):</label>
+      <input type="number" id="custom-calories" name="custom_calories_exe" min="0" class="modal-input">
+
+      <br><br>
+
+      <div style="text-align: center;">
+        <button type="submit" name="submit_custom" class="modal-submit">Add Exercise</button>
+      </div>
+    </form>
+  </div>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const nameInput = document.getElementById("custom-name");
+    const minutesInput = document.getElementById("custom-minutes");
+    const caloriesInput = document.getElementById("custom-calories");
+
+    const suggestionBox = document.createElement("div");
+    suggestionBox.setAttribute("id", "exercise-suggestions");
+    suggestionBox.classList.add("autocomplete-suggestions");
+
+    // Append suggestion box below the input inside the wrapper
+    const wrapper = nameInput.closest(".input-wrapper");
+    wrapper.appendChild(suggestionBox);
+
+    nameInput.addEventListener("input", () => {
+      const query = nameInput.value.trim();
+      if (query.length < 2) {
+        suggestionBox.innerHTML = "";
+        return;
+      }
+
+      fetch(`/search_exercises?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+          suggestionBox.innerHTML = "";
+          data.forEach(item => {
+            const option = document.createElement("div");
+            option.classList.add("suggestion");
+            option.textContent = item.name;
+            option.onclick = () => {
+              nameInput.value = item.name;
+              minutesInput.value = item.duration;
+              caloriesInput.value = item.calories;
+              suggestionBox.innerHTML = "";
+            };
+            suggestionBox.appendChild(option);
           });
-      
-          document.addEventListener("click", (e) => {
-              if (!suggestionBox.contains(e.target) && e.target !== nameInput) {
-                  suggestionBox.innerHTML = "";
-              }
-          });
-      });
-      </script>
-      
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!suggestionBox.contains(e.target) && e.target !== nameInput) {
+        suggestionBox.innerHTML = "";
+      }
+    });
+  });
+</script>

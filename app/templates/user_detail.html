@@ -17,7 +17,7 @@
     <!-- Exercise Log Column -->
     <div class="column">
       <div class="column-header">
-        <h2>{{ user.full_name }}'s Exercise Log</h2>
+        <h2>{{ user.username }}'s Exercise Log</h2>
       </div>
 
       <table>
@@ -52,7 +52,7 @@
     <!-- Calorie Counter Column -->
     <div class="column">
       <div class="column-header">
-        <h2>{{ user.full_name }}'s Calorie Counter</h2>
+        <h2>{{ user.username }}'s Calorie Counter</h2>
       </div>
 
       <table>
@@ -80,6 +80,9 @@
 
       <h3>Weekly Calorie Intake</h3>
       <canvas id="weeklyIntakeChart" width="400" height="200"></canvas>
+      <p id="noDataMsg" style="text-align:center; color: grey; display: none;">
+        No data for this week yet.
+      </p>
     </div>
 
   </div>
@@ -89,8 +92,6 @@
 
 <script>
   const burnedData = {{ chart_data | tojson }};
-  const intakeData = [ {% for log in meal_log %} {{ log.food.calories }}, {% endfor %} ];
-
   const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   // Calories Burned Chart
@@ -113,26 +114,39 @@
     }
   });
 
-  // Calorie Intake Chart
-  new Chart(document.getElementById('weeklyIntakeChart').getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: labels.slice(0, intakeData.length),
-      datasets: [{
-        label: 'Calorie Intake',
-        data: intakeData,
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 1)',
-        fill: true,
-        tension: 0.3
-      }]
-    },
-    options: {
-      scales: {
-        y: { beginAtZero: true }
+  // Calories Eaten Chart
+  fetch(`/api/calorie-data?user_id={{ user.id }}`)
+    .then(res => res.json())
+    .then(data => {
+      const intakeLabels = data.map(d => d.label);
+      const intakeValues = data.map(d => d.calories);
+
+      if (intakeValues.every(v => v === 0)) {
+        document.getElementById("noDataMsg").style.display = "block";
       }
-    }
-  });
+
+      new Chart(document.getElementById('weeklyIntakeChart').getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: intakeLabels,
+          datasets: [{
+            label: 'Calorie Intake',
+            data: intakeValues,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    })
+    .catch(err => console.error("Failed to load intake data:", err));
 </script>
 
 </body>

@@ -11,6 +11,19 @@
 <body>
 
 {% include 'header.html' %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+          <span>{{ message }}</span>
+          <button class="flash-close" onclick="this.parentElement.remove();">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
 
 <main>
   <div class="columns">

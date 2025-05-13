@@ -1,5 +1,5 @@
 from app import app, db
-from app.models import User, Exercise, ExerciseLog, Meal, MealLog, Scoreboard
+from app.models import User, Exercise, ExerciseLog, Food, MealLog, Scoreboard
 from faker import Faker
 from werkzeug.security import generate_password_hash
 from datetime import date, timedelta
@@ -14,14 +14,14 @@ with app.app_context():
     teams = ["Red Dragons", "Blue Sharks", "Green Giants", "Yellow Tigers"]
 
     users = []
-    for _ in range(10):   # Create 5 random users
+    for _ in range(10):  # Create 10 random users
         user = User(
             username=fake.user_name(),
             full_name=fake.name(),
             email=fake.email(),
             password=generate_password_hash("password123"),
             is_verified=True,
-            team=random.choice(teams)   # Assign team here
+            team=random.choice(teams)
         )
         db.session.add(user)
         users.append(user)
@@ -29,18 +29,17 @@ with app.app_context():
     db.session.commit()  # Commit users first to get their IDs
 
     for user in users:
-        # Create random Exercises & Meals (3 custom + 3 global)
         exercises = []
         meals = []
 
         for _ in range(5):
             # Custom Exercise & Meal
             ex = Exercise(name=fake.word().capitalize(), duration_minutes=random.randint(20, 60), user_id=user.id)
-            meal = Meal(name=fake.word().capitalize(), calories=random.randint(300, 900), user_id=user.id)
+            meal = Food(name=fake.unique.word().capitalize(), calories=random.randint(300, 900))
             # Global Exercise & Meal
             ex_null = Exercise(name=fake.word().capitalize(), duration_minutes=random.randint(20, 60), user_id=None)
-            meal_null = Meal(name=fake.word().capitalize(), calories=random.randint(300, 900), user_id=None)
-            
+            meal_null = Food(name=fake.unique.word().capitalize(), calories=random.randint(300, 900))
+
             db.session.add_all([ex, meal, ex_null, meal_null])
             exercises.extend([ex, ex_null])
             meals.extend([meal, meal_null])
@@ -70,14 +69,14 @@ with app.app_context():
 
             meal_log = MealLog(
                 user_id=user.id,
-                meal_id=chosen_meal.id,
+                food_id=chosen_meal.id,
                 date=log_date
             )
             db.session.add(meal_log)
 
-        db.session.commit()  # Commit logs before calculating total calories
+        db.session.commit()
 
-        # Calculate total calories burned **for today only**
+        # Calculate total calories burned today
         today_burned = db.session.query(
             db.func.sum(ExerciseLog.calories_burned)
         ).filter_by(user_id=user.id, date=date.today()).scalar() or 0

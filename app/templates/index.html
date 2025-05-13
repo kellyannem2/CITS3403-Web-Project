@@ -28,26 +28,28 @@
         </div>
         <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
       </div>
-      <p class="subheading">Today's scoreboard</p>
+      <p class="subheading">This Week's Scoreboard:</p>
   
       <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>User</th>
-            <th>Net Calories</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for entry in scoreboard %}
-<tr>
-  <td>{{ loop.index }}</td>
-  <td><a href="{{ url_for('user_detail', user_id=entry.user.id) }}">{{ entry.user.full_name }}</a></td>
-  <td>{{ entry.net | round(2) }}</td>
-</tr>
-{% endfor %}
-
-      </table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>User</th>
+      <th>Username</th>
+      <th>Net Calories</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in scoreboard %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td><a href="{{ url_for('user_detail', user_id=entry.user.id) }}">{{ entry.user.full_name }}</a></td>
+      <td>{{ entry.user.username }}</td>
+      <td>{{ entry.net | round(2) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
       <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
       <br>

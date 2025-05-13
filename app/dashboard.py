@@ -165,10 +165,14 @@ def dashboard():
 @app.route("/calorie-counter", methods=["GET", "POST"])
 def calorie_counter():
     # Must be logged in
-    user_id = session.get("user_id")
+    user_id = request.args.get("user_id")
     if not user_id:
-        flash("Please log in to view your meals.", "error")
-        return redirect(url_for("login"))
+        return {"error": "Not logged in"}, 401
+
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        return {"error": "Invalid user ID"}, 400
 
     # Handle form POST
     if request.method == "POST":
@@ -348,16 +352,16 @@ def user_detail(user_id):
 
 @app.route('/api/calorie-data')
 def get_calorie_data():
-    user_id = session.get("user_id")
+    user_id = request.args.get("user_id") or session.get("user_id")
     if not user_id:
         return {"error": "Not logged in"}, 401
 
-    # Get week offset from URL (same logic as exercise_log)
     try:
-        week_offset = int(request.args.get("week", 0))
+        user_id = int(user_id)
     except ValueError:
-        week_offset = 0
+        return {"error": "Invalid user ID"}, 400
 
+    week_offset = int(request.args.get("week", 0))
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
     days = [start_of_week + timedelta(days=i) for i in range(7)]

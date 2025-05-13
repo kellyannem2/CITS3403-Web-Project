@@ -34,7 +34,7 @@
                 <td>
                     <a href="{{ url_for('user_detail', user_id=log.user_id) }}">View {{ log.user_name }}'s FitTrack</a>
                 </td>
-                <td>{{ log.time }}</td>
+                <td>{{ log.date.strftime('%b %d, %Y') }}</td>
               </tr>
             {% else %}
               <tr><td colspan="2">No shared logs yet.</td></tr>

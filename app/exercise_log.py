@@ -1,4 +1,4 @@
-from flask import request, redirect, url_for, flash, session, render_template
+from flask import request, redirect, url_for, flash, session, render_template, jsonify
 from app import app, db
 from app.models import User, Exercise, ExerciseLog, Scoreboard
 from datetime import date, timedelta, datetime
@@ -26,39 +26,48 @@ def add_exercise():
         return redirect(url_for("dashboard"))
 
     # Form inputs
-    default_name = request.form.get("default_exercise")
+    default_name = request.form.get("default_exercise", "").strip()
     default_minutes = request.form.get("default_minutes")
-    custom_name = request.form.get("custom_name_exe")
+    custom_name = request.form.get("custom_name_exe", "").strip()
     custom_minutes = request.form.get("custom_minutes")
     custom_calories = request.form.get("custom_calories_exe")
 
     try:
-        # Case 1: Default exercise
-        if "submit_default" in request.form:
+        # Case 1: Default exercise (global exercise, user_id = None)
+        if "submit_default" in request.form and default_name:
             exercise = Exercise.query.filter_by(user_id=None, name=default_name).first()
             if not exercise:
-                exercise = Exercise(name=default_name, duration_minutes=30)
+                # Create the global exercise
+                exercise = Exercise(name=default_name, duration_minutes=30, user_id=None)
                 db.session.add(exercise)
                 db.session.commit()
 
             duration = float(default_minutes)
-            calories = duration * 8  # Estimate
+            calories = duration * 8  # Basic estimate
 
-        # Case 2: Custom exercise
-        elif "submit_custom" in request.form:
+        # Case 2: Custom exercise (user-specific)
+        elif "submit_custom" in request.form and custom_name:
+            # Check if user already added this custom exercise
+            exercise = Exercise.query.filter_by(user_id=user_id, name=custom_name).first()
             duration = float(custom_minutes)
             rate = float(custom_calories) / 30
             calories = rate * duration
 
-            exercise = Exercise(name=custom_name, duration_minutes=duration, user_id=user_id)
-            db.session.add(exercise)
-            db.session.commit()
+            if not exercise:
+                # Add new custom exercise
+                exercise = Exercise(name=custom_name, duration_minutes=duration, user_id=user_id)
+                db.session.add(exercise)
+                db.session.commit()
+            else:
+                # Update duration if needed
+                exercise.duration_minutes = duration
+                db.session.commit()
 
         else:
             flash("Please fill out all required fields.", "error")
             return redirect(url_for("dashboard"))
 
-        # Log the exercise with chosen date
+        # Log the exercise for today
         log = ExerciseLog(
             user_id=user.id,
             exercise_id=exercise.id,
@@ -67,28 +76,50 @@ def add_exercise():
             date=log_date
         )
         db.session.add(log)
-
-        # Update or create scoreboard entry for that date
-        scoreboard = Scoreboard.query.filter_by(user_id=user.id, timestamp=log_date).first()
-        if scoreboard:
-            scoreboard.total_calories_burned += calories
-        else:
-            scoreboard = Scoreboard(
-                user_id=user.id,
-                total_calories_burned=calories,
-                timestamp=log_date
-            )
-            db.session.add(scoreboard)
-
         db.session.commit()
-        flash("Exercise logged and leaderboard updated!", "success")
+
+        flash("✅ Exercise logged successfully!", "success")
+        return redirect(url_for("dashboard"))
 
     except Exception as e:
         db.session.rollback()
-        flash("An error occurred while logging the exercise.", "error")
-        print("Exercise log error:", e)
+        flash(f"Error logging exercise: {str(e)}", "error")
+        return redirect(url_for("dashboard"))
+    
+@app.route('/search_exercises')
+def search_exercises():
+    query = request.args.get('q', '').lower()
+    user_id = session.get("user_id")
 
-    return redirect(url_for("dashboard"))
+    if not query or not user_id:
+        return jsonify([])
+
+    matches = Exercise.query.filter(
+        Exercise.name.ilike(f"%{query}%"),
+        db.or_(Exercise.user_id == user_id, Exercise.user_id == None)
+    ).limit(5).all()
+
+    # Estimate calories burned rate per 30 min
+    result = []
+    for ex in matches:
+        # Assume 8 cal/min as base if we don't have logs
+        logs = ExerciseLog.query.filter_by(exercise_id=ex.id).all()
+        if logs:
+            avg_cals_per_min = sum(l.calories_burned for l in logs) / sum(l.duration_minutes for l in logs)
+        else:
+            avg_cals_per_min = 8.0
+
+        cal_per_30 = round(avg_cals_per_min * 30, 2)
+
+        result.append({
+            "name": ex.name,
+            "duration": ex.duration_minutes,
+            "calories": cal_per_30
+        })
+
+    return jsonify(result)
+
+
 
 
 # Exercise Log Page (week-based)

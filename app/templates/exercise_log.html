@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <title>FitTrack Exercise Log</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
   <style>
     .week-nav-wrapper {
       display: flex;
@@ -39,90 +40,101 @@
     .week-btn:hover {
       transform: scale(1.05);
     }
+
+    .add-btn {
+      float: right;
+      font-size: 20px;
+      padding: 5px 12px;
+      margin-bottom: 10px;
+      margin-top: -35px;
+      background-color: white;
+      color: black;
+      border: 2px solid black;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .add-btn:hover {
+      background-color: #f0f0f0;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Shared Header -->
-  {% include 'header.html' %}
+<!-- Shared Header -->
+{% include 'header.html' %}
 
-  <!-- Main content for Exercise Log -->
-  <main>
+<!-- Main Content -->
+<main>
+  <div style="position: relative;">
     <h2>Exercise Log</h2>
+    <!-- Include the modal trigger and modal itself -->
+    {% include 'partials/add_exercise_form.html' %}
+  </div>
 
-    <!-- Week Navigation -->
-    <div class="week-nav-wrapper">
-      <div class="week-nav-inner">
-        <form method="get" action="{{ url_for('exercise_log') }}">
-          <input type="hidden" name="week" value="{{ week_offset - 1 }}">
-          <button type="submit" class="week-btn">&#8592; Prev</button>
-        </form>
+  <!-- Week Navigation -->
+  <div class="week-nav-wrapper">
+    <div class="week-nav-inner">
+      <form method="get" action="{{ url_for('exercise_log') }}">
+        <input type="hidden" name="week" value="{{ week_offset - 1 }}">
+        <button type="submit" class="week-btn">&#8592; Prev</button>
+      </form>
 
-        <div class="week-range">
-          {{ start_of_week.strftime('%b %d') }} – {{ end_of_week.strftime('%b %d, %Y') }}
-        </div>
-
-        <form method="get" action="{{ url_for('exercise_log') }}">
-          <input type="hidden" name="week" value="{{ week_offset + 1 }}">
-          <button type="submit" class="week-btn">Next &#8594;</button>
-        </form>
+      <div class="week-range">
+        {{ start_of_week.strftime('%b %d') }} – {{ end_of_week.strftime('%b %d, %Y') }}
       </div>
+
+      <form method="get" action="{{ url_for('exercise_log') }}">
+        <input type="hidden" name="week" value="{{ week_offset + 1 }}">
+        <button type="submit" class="week-btn">Next &#8594;</button>
+      </form>
     </div>
+  </div>
 
-    <!-- Add Exercise Button -->
-    <button id="openLogModalBtn" class="button">+ Add Exercise Entry</button>
+  <!-- Exercise Log Table -->
+  {% include 'partials/exerciselog.html' %}
 
-    <!-- Modal for Adding Exercise -->
-    <div id="logModal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn" id="closeLogModal">&times;</span>
-        <h2>Add Exercise</h2>
-        {% include 'partials/add_exercise_form.html' %}
-      </div>
-    </div>
+  <!-- Weekly Calories Chart -->
+  <h3>Weekly Calories Burned</h3>
+  <canvas id="exerciseChart" width="400" height="200"></canvas>
+</main>
 
-    <!-- Exercise Log Table -->
-    {% include 'partials/exerciselog.html' %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Weekly Calories Chart -->
-    <h3>Weekly Calories Burned</h3>
-    <canvas id="exerciseChart" width="400" height="200"></canvas>
-  </main>
-
-  <!-- Load Chart.js from CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const ctxExercise = document.getElementById('exerciseChart').getContext('2d');
-    const exerciseChart = new Chart(ctxExercise, {
-      type: 'bar',
-      data: {
-        labels: {{ ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] | tojson }},
-        datasets: [{
-          label: 'Calories Burned',
-          data: {{ chart_data | tojson }},
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true
-          }
+<!-- Chart Setup -->
+<script>
+  const ctxExercise = document.getElementById('exerciseChart').getContext('2d');
+  const exerciseChart = new Chart(ctxExercise, {
+    type: 'bar',
+    data: {
+      labels: {{ ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] | tojson }},
+      datasets: [{
+        label: 'Calories Burned',
+        data: {{ chart_data | tojson }},
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
         }
       }
-    });
-  </script>
+    }
+  });
+</script>
 
-  <!-- Footer -->
-  <footer>
-    &copy; 2025 FitTrack. All rights reserved.
-  </footer>
+<!-- Footer -->
+<footer>
+  &copy; 2025 FitTrack. All rights reserved.
+</footer>
 
-  <!-- Modal JS -->
-  <script src="{{ url_for('static', filename='JS/exercise_log.js') }}"></script>
+<!-- Modal Script -->
+<script src="{{ url_for('static', filename='JS/exercise_log.js') }}"></script>
 
 </body>
 </html>

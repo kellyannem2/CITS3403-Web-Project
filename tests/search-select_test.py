@@ -52,11 +52,17 @@ def flask_server():
 # ────────────────────────────────
 @pytest.fixture(scope='module')
 def driver():
-    opts = webdriver.ChromeOptions()
-    opts.add_argument('--headless'); opts.add_argument('--no-sandbox')
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless=new')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument("--incognito")
+
+
     service = Service(ChromeDriverManager().install())
-    drv = webdriver.Chrome(service=service, options=opts)
-    yield drv; drv.quit()
+    drv = webdriver.Chrome(service=service, options=options)
+    yield drv
+    drv.quit()
 
 # ────────────────────────────────
 # Utility: log in as tester

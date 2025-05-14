@@ -1,6 +1,10 @@
 import pytest
 from datetime import datetime, date, timedelta
 
+import sys, os
+# ensure project root is on sys.path so imports work
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from app import app, db
 from app.models import User, Food, MealLog, ExerciseLog, Scoreboard
 

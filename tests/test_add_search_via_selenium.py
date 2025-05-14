@@ -52,11 +52,17 @@ def flask_server():
 # ────────────────────────────────
 @pytest.fixture(scope='module')
 def driver():
-    opts = webdriver.ChromeOptions()
-    opts.add_argument('--headless'); opts.add_argument('--no-sandbox')
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless=new')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument("--incognito")
+
+
     service = Service(ChromeDriverManager().install())
-    drv = webdriver.Chrome(service=service, options=opts)
-    yield drv; drv.quit()
+    drv = webdriver.Chrome(service=service, options=options)
+    yield drv
+    drv.quit()
 
 # ────────────────────────────────
 # Utility: log in as tester
@@ -103,11 +109,20 @@ def test_add_search_via_selenium(driver):
     )
     items[0].click()
 
-    # 6. Wait for the “Add Selected Food” button to become enabled and click it
-    submit_btn = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, 'submitChooseBtn'))
+    # 5.1 Wait for selection to register
+    WebDriverWait(driver, 5).until(
+        lambda d: "selected" in items[0].get_attribute("class")
     )
-    submit_btn.click()
+
+    # 5.2 Wait until button is enabled
+    submit_btn = WebDriverWait(driver, 5).until(
+        lambda d: driver.find_element(By.ID, 'submitChooseBtn').is_enabled()
+    )
+
+    # 6. Click the now-enabled button
+    submit_btn = driver.find_element(By.ID, 'submitChooseBtn')
+    if submit_btn.is_enabled():
+        submit_btn.click()
 
     # 7. Finally, verify the new row appears in column 3’s table
     WebDriverWait(driver, 10).until(

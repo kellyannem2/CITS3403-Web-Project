@@ -13,6 +13,11 @@
 <body>
 
   {% include 'header.html' %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
 
   <main>
 

@@ -93,7 +93,6 @@ A fitness tracker web app for logging meals, tracking exercises, and sharing you
 
 6. **Run the app:**
    ```bash
-   export FLASK_APP=app
    flask run
    ```
 

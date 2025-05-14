@@ -165,7 +165,7 @@ def dashboard():
 @app.route("/calorie-counter", methods=["GET", "POST"])
 def calorie_counter():
     # Must be logged in
-    user_id = request.args.get("user_id")
+    user_id = session.get("user_id")
     if not user_id:
         return {"error": "Not logged in"}, 401
 
@@ -252,10 +252,39 @@ def calorie_counter():
         date=date
     )
 
-
 @app.route('/leaderboard')
 def leaderboard():
-    return render_template('leaderboard.html')
+    # require login
+    if 'user_id' not in session:
+        flash("Please log in first.", "error")
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    team_scoreboard = []
+
+    if user and user.team:
+        today = date.today()
+        for teammate in User.query.filter_by(team=user.team).all():
+            # today's logs
+            ex_logs   = [l for l in teammate.exercise_logs if l.date == today]
+            meal_logs = [l for l in teammate.meal_logs     if l.date == today]
+            if not ex_logs or not meal_logs:
+                continue
+
+            total_burned = sum(l.calories_burned for l in ex_logs)
+            total_eaten  = sum(l.food.calories     for l in meal_logs)
+
+            team_scoreboard.append({
+                "user":               teammate,
+                "exercise_calories":  total_burned,
+                "food_calories":      total_eaten,
+                "net":                total_eaten - total_burned
+            })
+
+        team_scoreboard.sort(key=lambda x: x['net'], reverse=True)
+
+    return render_template('leaderboard.html',
+                           scoreboard=team_scoreboard)
 
 
 @app.route('/refresh_scoreboard')

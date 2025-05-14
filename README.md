@@ -9,6 +9,7 @@ A fitness tracker web app for logging meals, tracking exercises, and sharing you
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Setup and Installation](#setup-and-installation)
+- [USDA API Key](#-usda-api-key-optional-but-recommended)
 - [Troubleshooting](#troubleshooting)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -91,16 +92,7 @@ A fitness tracker web app for logging meals, tracking exercises, and sharing you
    ```
 
 6. **Run the app:**
-
-   **Windows PowerShell:**
-   ```powershell
-   $env:FLASK_APP = "app"
-   flask run
-   ```
-
-   **Mac/Linux or Git Bash:**
    ```bash
-   export FLASK_APP=app
    flask run
    ```
 
@@ -128,15 +120,11 @@ If you're setting up FitTrack for the first time and run into issues, here are s
     ```bash
     .\venv\Scripts\activate  # Windows
     ```
-  - Did you run `flask run` with the right environment variable?
-    ```bash
-    $env:FLASK_APP = "app"
-    ```
 
 - **Missing dependencies?**
   - Run:
     ```bash
-    pip install -r requirement.txt
+    pip install -r requirements.txt
     ```
 
 - **Database migration fails or tables missing?**

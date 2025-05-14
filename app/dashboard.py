@@ -165,7 +165,7 @@ def dashboard():
 @app.route("/calorie-counter", methods=["GET", "POST"])
 def calorie_counter():
     # Must be logged in
-    user_id = request.args.get("user_id")
+    user_id = session.get("user_id")
     if not user_id:
         return {"error": "Not logged in"}, 401
 

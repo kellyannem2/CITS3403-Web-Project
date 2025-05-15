@@ -43,10 +43,11 @@ def dashboard():
             if not name or not cal.isdigit():
                 flash("Provide both a name (text) and calories (number).", "warning")
                 return redirect(url_for("dashboard"))
-
-            food = Food(name=name, calories=int(cal), serving_size="(custom)",user_id = Food_user_id)
-            db.session.add(food)
-            db.session.commit()
+            check_if_exists = Food.query.filter(Food.name == name, Food.user_id == Food_user_id,Food.calories == int(cal)).first()
+            if not check_if_exists:
+                food = Food(name=name, calories=int(cal), serving_size="(custom)",user_id = Food_user_id)
+                db.session.add(food)
+                db.session.commit()
 
         else:
             flash("Unknown action.", "error")
@@ -108,20 +109,39 @@ def dashboard():
     all_teams = [team[0] for team in all_teams]
 
     # 🔹 Custom Team Leaderboard: Net Calories = Eaten - Burned
-    total_eaten = 0
     team_member_scoreboard = []
+
     if user.team:
         team_users = User.query.filter_by(team=user.team).all()
 
         for teammate in team_users:
+            # Filter logs for today
             today_logs = [log for log in teammate.exercise_logs if log.date == date.today()]
             today_meals = [log for log in teammate.meal_logs if log.date == date.today()]
 
             if not today_logs or not today_meals:
                 continue
 
-            total_burned = sum(log.calories_burned for log in today_logs)
-            total_eaten = sum(log.food.calories for log in today_meals)
+            total_burned = (
+                db.session.query(func.sum(ExerciseLog.calories_burned))
+                .filter(
+                    ExerciseLog.user_id == teammate.id,
+                    ExerciseLog.date == date.today()
+                )
+                .scalar()
+            ) or 0
+
+            total_eaten = (
+                db.session.query(func.sum(Food.calories))
+                .select_from(MealLog)
+                .join(Food, MealLog.food_id == Food.id)
+                .filter(
+                    MealLog.user_id == teammate.id,
+                    MealLog.date == date.today()
+                )
+                .scalar()
+            ) or 0
+
             net = total_eaten - total_burned
 
             team_member_scoreboard.append({
@@ -131,8 +151,11 @@ def dashboard():
                 "net": net
             })
 
-        team_member_scoreboard.sort(key=lambda x: x["net"])
 
+        team_member_scoreboard.sort(key=lambda x: x["net"])
+        
+    today_meals_user = [log for log in user.meal_logs if log.date == date.today()]
+    total_eaten_user = sum(log.food.calories for log in today_meals_user if log.food)
     # 🔹 Weekly calories burned chart
     today = date.today()
     week_start = today - timedelta(days=today.weekday())  # Monday
@@ -155,8 +178,8 @@ def dashboard():
         form=form,
         exercise=user.exercises,
         exercise_log=todays_exercises,
-        meal_log=today_meals,
-        total_eaten=total_eaten,
+        meal_log=today_meals_user,
+        total_eaten=total_eaten_user,
         scoreboard=team_member_scoreboard,
         user_total_calories_burnt=total_calories,
         chart_data=chart_data,
@@ -192,7 +215,7 @@ def calorie_counter():
             if not food_id:
                 flash("Please pick a food from the search results.", "warning")
                 return redirect(url_for("calorie_counter"))
-            food = Food.query.filter(food_id,user_id = session.get("user_id"))
+            food = Food.query.filter(Food.id == food_id,Food.user_id == session.get("user_id")).first()
             if not food:
                 flash("That food isn’t in our database—please search again.", "error")
                 return redirect(url_for("calorie_counter"))

@@ -87,13 +87,15 @@
     </div>
   </div>
 
-  <!-- Exercise Log Table -->
-  {% include 'partials/exerciselog.html' %}
+  <div class="column">
+    <!-- Exercise Log Table -->
+    {% include 'partials/exerciselog.html' %}
 
-  <!-- Weekly Calories Chart -->
-  <h3>Weekly Calories Burned</h3>
-  <canvas id="exerciseChart" width="400" height="200"></canvas>
-</main>
+    <!-- Weekly Calories Chart -->
+    <h3>Weekly Calories Burned</h3>
+    <canvas id="exerciseChart" width="400" height="200"></canvas>
+  </main>
+</div>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

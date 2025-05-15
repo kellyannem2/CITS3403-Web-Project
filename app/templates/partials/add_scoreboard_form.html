@@ -1,32 +1,94 @@
-<!-- partials/add_scoreboard_form.html -->
-
 <!-- Leaderboard Trigger -->
-
 <button id="openScoreboardBtn" class="add-btn" title="Team Edit">+</button>
 
 <div id="scoreboardModal" class="modal">
-    <div class="modal-content">
-      <span id="closeScoreboardBtn" class="close-btn">&times;</span>
-      <form action = "/update_team" method="POST">
-  
-      <!-- Create Team Form -->
-      <form action="/update_team" method="POST" style="margin-bottom: 10px;">
-        <label for="new_team"><strong>Create a New Team:</strong></label><br>
-        <input type="text" name="new_team" placeholder="Enter team name" required>
-        <button type="submit">Create</button>
-      </form>
-  
-      <!-- Join Team Form -->
-      <form action="/update_team" method="POST">
-        <label for="team"><strong>Join Existing Team:</strong></label>
-        <select name="team" id="team">
-          {% for team_name in all_teams %}
-            <option value="{{ team_name }}" {% if user.team == team_name %}selected{% endif %}>{{ team_name }}</option>
-          {% endfor %}
-        </select>
-        <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
-        <button type="submit">Join</button>
-      </form>
-    </div>
+  <div class="modal-content">
+    <span id="closeScoreboardBtn" class="close-btn">&times;</span>
+
+    <!-- Create Team Form -->
+    <form action="/update_team" method="POST" style="margin-bottom: 15px;">
+      <label for="new_team"><strong>Create a New Team:</strong></label><br>
+      <input type="text" name="new_team" placeholder="Enter team name" required>
+      <button type="submit">Create</button>
+    </form>
+
+    <!-- Join Team Form -->
+    <form action="/update_team" method="POST">
+      <label for="team"><strong>Join Existing Team:</strong></label>
+      <div class="autocomplete-wrapper">
+        <input type="text" id="teamInput" name="team" placeholder="Type to search teams..." autocomplete="off" required>
+        <div id="teamSuggestions" class="autocomplete-suggestions"></div>
+      </div>
+      <button type="submit">Join</button>
+      <button type="button" onclick="location.reload();">Refresh Scoreboard</button>
+    </form>
   </div>
-  
+</div>
+
+<!-- Styles -->
+<style>
+  .autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  .suggestion {
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .suggestion:hover {
+    background-color: #eee;
+  }
+</style>
+
+<!-- Autocomplete Script -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const input = document.getElementById("teamInput");
+    const suggestionsBox = document.getElementById("teamSuggestions");
+
+    input.addEventListener("input", function () {
+      const query = input.value.trim();
+      if (!query) {
+        suggestionsBox.innerHTML = "";
+        return;
+      }
+
+      fetch(`/search_teams?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          suggestionsBox.innerHTML = "";
+          data.forEach(team => {
+            const div = document.createElement("div");
+            div.textContent = team;
+            div.classList.add("suggestion");
+            div.addEventListener("click", () => {
+              input.value = team;
+              suggestionsBox.innerHTML = "";
+            });
+            suggestionsBox.appendChild(div);
+          });
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!suggestionsBox.contains(e.target) && e.target !== input) {
+        suggestionsBox.innerHTML = "";
+      }
+    });
+  });
+</script>

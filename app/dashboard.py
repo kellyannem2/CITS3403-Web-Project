@@ -312,6 +312,13 @@ def leaderboard():
     return render_template('leaderboard.html',
                            scoreboard=team_scoreboard)
 
+@app.route("/search_teams")
+def search_teams():
+    q = request.args.get("q", "").lower()
+    all_teams = [user.team for user in User.query.filter(User.team.isnot(None)).distinct()]
+    team_names = sorted(set([t for t in all_teams if t and q in t.lower()]))
+    return jsonify(team_names)
+
 
 @app.route('/refresh_scoreboard')
 def refresh_scoreboard():
@@ -493,3 +500,4 @@ def foods_search():
             })
 
     return jsonify(results)
+

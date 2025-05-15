@@ -98,6 +98,7 @@ img {
   background: none;
   color: var(--white-color);
   padding-block: 1rem;
+  
 }
 
 .login__input::placeholder {
@@ -147,6 +148,13 @@ img {
   color: var(--black-color);
   font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.8s ease, color 0.8s ease;
+}
+
+/* Corrected class name and changed to color fade */
+.login__button:hover {
+  background-color: #5d00ff;
+  color: var(--white-color);
 }
 
 .login__register {

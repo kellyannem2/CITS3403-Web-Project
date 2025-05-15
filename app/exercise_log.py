@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, flash, session, render_template, jsonify
 from app import app, db
-from app.models import User, Exercise, ExerciseLog, Scoreboard
+from app.models import User, Exercise, ExerciseLog, Scoreboard, MealLog
 from datetime import date, timedelta, datetime
 from sqlalchemy import func
 
@@ -173,3 +173,48 @@ def exercise_log_page():
         start_of_week=start_of_week,
         end_of_week=end_of_week
     )
+
+@app.route("/delete_recent_exercise", methods=["POST"])
+def delete_recent_exercise():
+    # Fetch the most recent log by highest ID
+    today = date.today()
+    recent = (
+        ExerciseLog.query
+        .filter_by(user_id=session.get("user_id"),date=today)
+        .order_by(ExerciseLog.id.desc())
+        .first()
+    )
+
+    if recent:
+        db.session.delete(recent)
+        db.session.commit()
+        flash("Most recent exercise deleted.")
+    else:
+        flash("No exercise logs to delete.", "warning")
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/delete_recent_meal", methods=["POST"])
+def delete_recent_meal():
+    user_id = session.get("user_id")
+    if not user_id:
+        flash("You must be logged in to perform this action.", "error")
+        return redirect(url_for("dashboard"))
+
+    today = date.today()
+
+    recent = (
+        MealLog.query
+        .filter_by(user_id=user_id, date=today)
+        .order_by(MealLog.id.desc())
+        .first()
+    )
+
+    if recent:
+        db.session.delete(recent)
+        db.session.commit()
+        flash("Most recent meal from today deleted.")
+    else:
+        flash("No meal entries found for today.", "warning")
+
+    return redirect(url_for("dashboard"))

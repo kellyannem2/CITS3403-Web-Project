@@ -24,6 +24,7 @@
             <option value="{{ team_name }}" {% if user.team == team_name %}selected{% endif %}>{{ team_name }}</option>
           {% endfor %}
         </select>
+        <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
         <button type="submit">Join</button>
       </form>
     </div>

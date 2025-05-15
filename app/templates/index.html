@@ -62,7 +62,7 @@
         </tbody>
       </table>
 
-      <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
+      
       <br>
       <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
     </div>
@@ -71,7 +71,14 @@
     <div class="column">
       <div class="column-header">
         <h2 onclick="location.href='{{ url_for('exercise_log') }}'" style="cursor:pointer;">Exercise Log</h2>
+        <div class="log-controls">
         {% include 'partials/add_exercise_form.html' %}
+        <form method="POST" action="/delete_recent_exercise">
+          <button type="submit" class="btn-link">-</button>
+        </form>
+        </div>
+
+
         <div id="exerciseModal" class="modal">
           <div class="modal-content">
             <span id="closeExerciseModal" class="close-btn">&times;</span>
@@ -116,7 +123,12 @@
         <h2 onclick="location.href='{{ url_for('calorie_counter') }}'" style="cursor:pointer;">
           Calorie Counter
         </h2>
+        <div class="log-controls">
         <button id="openMealModalBtn" class="add-btn" title="Add a Meal">+</button>
+        <form method="POST" action="/delete_recent_meal">
+          <button type="submit" class="btn-link">-</button>
+        </form>
+        </div>
       </div>
       <table>
         <thead>

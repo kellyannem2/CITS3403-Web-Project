@@ -1,4 +1,5 @@
 <!-- Exercise Modal Trigger -->
+
 <button id="openExerciseModalBtn" class="add-btn" title="Add an Exercise">+</button>
 
 <!-- Exercise Modal -->
@@ -18,7 +19,7 @@
       <!-- Input with suggestion wrapper -->
       <div class="input-wrapper">
         <label for="custom-name">Exercise Name:</label>
-        <input type="text" id="custom-name" name="custom_name_exe" class="modal-input" placeholder="e.g. Running">
+        <input type="text" id="custom-name" name="custom_name_exe" class="modal-input" placeholder="Your Exercise" required autocomplete="off">
         <!-- Suggestions will appear here -->
       </div>
 
@@ -38,6 +39,7 @@
         <button type="submit" name="submit_custom" class="modal-submit">Add Exercise</button>
       </div>
     </form>
+
   </div>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </div>

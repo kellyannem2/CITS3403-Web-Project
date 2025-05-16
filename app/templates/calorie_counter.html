@@ -20,10 +20,9 @@
   {% endwith %}
 
   <main>
-
     <!-- Add Meal Button -->
-    <div class="section-header">
-      <h2>Calorie Counter</h2>
+    <div class="section-header" style="position: relative;">
+      <h1>Calorie Counter</h1>
       <button id="openMealModalBtn" class="add-btn" title="Add a Meal">+</button>
     </div>
 
@@ -47,29 +46,29 @@
     </div>
 
     <!-- Meal Table -->
-     
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Meal</th>
-          <th>Calories</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for log in meal_log %}
-        <tr>
-          <td>{{ log.date.strftime('%Y-%m-%d') }}</td>
-          <td>{{ log.food.name }}</td>
-          <td>{{ log.food.calories }}</td>
-        </tr>
-        {% else %}
-        <tr><td colspan="3">No meals logged this week.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
     <div class="column">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Meal</th>
+            <th>Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in meal_log %}
+          <tr>
+            <td>{{ log.date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ log.food.name }}</td>
+            <td>{{ log.food.calories }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3">No meals logged this week.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    
     <!-- Chart -->
     <h3>Weekly Calorie Intake</h3>
     <canvas id="calorieChart" width="400" height="200"></canvas>

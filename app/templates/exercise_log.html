@@ -6,54 +6,8 @@
   <title>FitTrack Exercise Log</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
-  <style>
-    .week-nav-wrapper {
-      display: flex;
-      justify-content: center;
-      margin: 1.5rem 0;
-    }
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-    .week-nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-    }
-
-    .week-range {
-      font-weight: bold;
-      font-size: 1rem;
-      text-align: center;
-    }
-
-    .week-btn {
-      background: none;
-      border: none;
-      color: #000;
-      font-size: 1rem;
-      font-family: 'Poppins', sans-serif;
-      cursor: pointer;
-      padding: 0.25rem 0.75rem;
-      transition: transform 0.1s ease;
-    }
-
-    .week-btn:hover {
-      transform: scale(1.05);
-    }
-
-    .add-btn {
-      float: right;
-      font-size: 20px;
-      padding: 5px 12px;
-      margin-bottom: 10px;
-      margin-top: -35px;
-      background-color: white;
-      color: black;
-      border: 2px solid black;
-      cursor: pointer;
-    }
-
-  </style>
 </head>
 <body>
 
@@ -62,27 +16,27 @@
 
 <!-- Main Content -->
 <main>
-  <div style="position: relative;">
-    <h2>Exercise Log</h2>
+  <div class="section-header" style="position: relative;">
+    <h1>Exercise Log</h1>
     <!-- Include the modal trigger and modal itself -->
     {% include 'partials/add_exercise_form.html' %}
   </div>
 
-  <!-- Week Navigation -->
+    <!-- Week Navigation -->
   <div class="week-nav-wrapper">
     <div class="week-nav-inner">
       <form method="get" action="{{ url_for('exercise_log') }}">
         <input type="hidden" name="week" value="{{ week_offset - 1 }}">
         <button type="submit" class="week-btn">&#8592; Prev</button>
       </form>
-
+    
       <div class="week-range">
-        {{ start_of_week.strftime('%b %d') }} – {{ end_of_week.strftime('%b %d, %Y') }}
+          {{ start_of_week.strftime('%b %d') }} – {{ end_of_week.strftime('%b %d, %Y') }}
       </div>
-
+    
       <form method="get" action="{{ url_for('exercise_log') }}">
-        <input type="hidden" name="week" value="{{ week_offset + 1 }}">
-        <button type="submit" class="week-btn">Next &#8594;</button>
+          <input type="hidden" name="week" value="{{ week_offset + 1 }}">
+          <button type="submit" class="week-btn">Next &#8594;</button>
       </form>
     </div>
   </div>
@@ -94,8 +48,8 @@
     <!-- Weekly Calories Chart -->
     <h3>Weekly Calories Burned</h3>
     <canvas id="exerciseChart" width="400" height="200"></canvas>
-  </main>
-</div>
+  </div>
+</main>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -130,6 +84,7 @@
 <footer>
   &copy; 2025 FitTrack. All rights reserved.
 </footer>
+<br>
 
 <!-- Modal Script -->
 <script src="{{ url_for('static', filename='JS/exercise_log.js') }}"></script>

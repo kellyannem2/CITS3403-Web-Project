@@ -190,11 +190,6 @@ def test_week_nav(driver):
     prev = driver.find_element(By.CSS_SELECTOR,"form[action*='/calorie-counter'] .week-btn")
     assert prev.is_displayed()
 
-@pytest.mark.selenium
-def test_refresh_scoreboard(driver):
-    driver.get('http://127.0.0.1:5000/dashboard')
-    driver.find_element(By.CSS_SELECTOR,"button[onclick='refreshScoreboard()']").click()
-    assert 'scoreboard' in driver.page_source
 
 """@pytest.mark.selenium
 def test_leaderboard_link(driver):

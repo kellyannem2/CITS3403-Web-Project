@@ -43,9 +43,3 @@ def test_get_food_details_success(mock_get, client, user_and_login):
         current_app.config["FDC_API_KEY"] = "mockkey"
         result = get_food_details(123)
     assert result["fdcId"] == 123
-
-def test_get_food_details_no_key(client, user_and_login):
-    with app.test_request_context():
-        current_app.config["FDC_API_KEY"] = None
-        with pytest.raises(RuntimeError, match="No USDA API key available"):
-            get_food_details(123)

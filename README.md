@@ -17,6 +17,12 @@ A fitness tracker web app for logging meals, tracking exercises, and sharing you
 - [License & References](#license--references)
 
 ---
+## Team Members:
+- Kelly-Anne McCabe 22976503
+- Ahamed Mohamed Fahim 23426094
+- Rowe O'Callaghan 23907299
+- Alan Williams 23361098
+---
 
 ## ✨ Features
 

@@ -31,7 +31,13 @@
     <!-- Leaderboard Column -->
     <div class="column">
       <div class="column-header">
-        <h2 onclick="location.href='{{ url_for('leaderboard') }}'" style="cursor:pointer;">Leaderboard</h2>
+        <h2 onclick="location.href='{{ url_for('leaderboard') }}'" style="cursor:pointer;">
+          {% if user.team %}
+            {{ user.team }}'s Leaderboard
+          {% else %}
+            Leaderboard
+          {% endif %}
+        </h2>
         {% include 'partials/add_scoreboard_form.html' %}
         <div id="scoreboardModal" class="modal">
           <div class="modal-content">

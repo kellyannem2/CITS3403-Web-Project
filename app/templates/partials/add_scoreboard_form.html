@@ -2,7 +2,7 @@
 
 <!-- Leaderboard Trigger -->
 
-<button id="openScoreboardBtn" class="add-btn" title="Team Edit">+</button>
+<button id="openScoreboardBtn" class="add-btn" title="Add/Change Team">+</button>
 
 <div id="scoreboardModal" class="modal">
     <div class="modal-content">
@@ -11,21 +11,27 @@
   
       <!-- Create Team Form -->
       <form action="/update_team" method="POST" style="margin-bottom: 10px;">
-        <label for="new_team"><strong>Create a New Team:</strong></label><br>
-        <input type="text" name="new_team" placeholder="Enter team name" required>
-        <button type="submit">Create</button>
+        <div style="text-align: center;">
+            <label for="new_team" style="font-size: 1.2em;"><strong>Create a New Team:</strong></label>
+          <input type="text" name="new_team" placeholder="Enter team name" required>
+          <button type="submit">Create</button>
+        </div>
       </form>
+      <br>
   
       <!-- Join Team Form -->
       <form action="/update_team" method="POST">
-        <label for="team"><strong>Join Existing Team:</strong></label>
-        <select name="team" id="team">
-          {% for team_name in all_teams %}
-            <option value="{{ team_name }}" {% if user.team == team_name %}selected{% endif %}>{{ team_name }}</option>
-          {% endfor %}
-        </select>
-        <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
-        <button type="submit">Join</button>
+        <div style="text-align: center;">
+            <label for="team" style="font-size: 1.2em;"><strong>Join Existing Team:</strong></label><br>
+          <br>
+          <select name="team" id="team">
+            {% for team_name in all_teams %}
+              <option value="{{ team_name }}" {% if user.team == team_name %}selected{% endif %}>{{ team_name }}</option>
+            {% endfor %}
+          </select>
+          <button onclick="refreshScoreboard()">Refresh Scoreboard</button>
+          <button type="submit">Join</button>
+        </div>
       </form>
     </div>
   </div>

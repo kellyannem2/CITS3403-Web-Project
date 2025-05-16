@@ -44,6 +44,11 @@ def dashboard():
         if "submit_choose" in request.form:
             food_id = request.form.get("selected_food_id")
             fdc_id = request.form.get("fdc_id")
+            # Missing selection: neither local nor USDA ID
+            if not food_id and not fdc_id:
+                flash("Please pick a food from the search results.", "warning")
+                return redirect(url_for("dashboard"))
+
             print("selected_food_id:", food_id)
             print("fdc_id:", fdc_id)
 

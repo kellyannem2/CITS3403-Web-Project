@@ -111,8 +111,23 @@ document.addEventListener('DOMContentLoaded', () => {
           el.classList.add('selected');
 
           // populate hidden fields
-          document.querySelector('input[name="selected_food_id"]').value  = el.dataset.id;
-          document.querySelector('input[name="selected_food_cal"]').value = el.dataset.cal;
+          const selectedIdField = document.querySelector('input[name="selected_food_id"]');
+          const fdcIdField      = document.querySelector('input[name="fdc_id"]');
+          const calField        = document.querySelector('input[name="selected_food_cal"]');
+
+          // Detect source by checking if ID is numeric and large (USDA fdcIds are 6-7 digits)
+          const isUsdaFood = el.dataset.id && el.dataset.id.length >= 6;
+
+        if (isUsdaFood) {
+          selectedIdField.value = "";
+          fdcIdField.value      = el.dataset.id;
+        } else {
+          selectedIdField.value = el.dataset.id;
+          fdcIdField.value      = "";
+        }
+
+calField.value = el.dataset.cal || "";
+
 
           // reflect in search box
           searchInput.value = el.textContent.split(' — ')[0];

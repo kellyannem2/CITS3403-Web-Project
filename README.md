@@ -11,6 +11,7 @@ A fitness tracker web app for logging meals, tracking exercises, and sharing you
 - [Setup and Installation](#setup-and-installation)
 - [USDA API Key](#-usda-api-key-optional-but-recommended)
 - [Troubleshooting](#troubleshooting)
+- [Testing](#testing)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License & References](#license--references)
@@ -140,6 +141,19 @@ If you're setting up FitTrack for the first time and run into issues, here are s
 
 If you're still stuck, open an issue or check the setup steps again from the top.
 
+---
+
+## Testing
+
+The project includes a comprehensive test suite with 79 individual tests, achieving over 90% code coverage. It includes a mix of unit tests (Python) and end-to-end tests (Selenium).
+
+> **Note:** Selenium tests require **Google Chrome** to be installed on your system.
+
+- **All Tests**
+   - Run:
+   ```bash
+   pytest --disable-warnings
+   ```
 
 ---
 
@@ -172,6 +186,7 @@ If you're still stuck, open an issue or check the setup steps again from the top
 
 - **License:** [MIT](LICENSE)
 - **Logo source:** [`fittracker_logo.png`](static/images/fittracker_logo.png) generated or adapted from public domain/CC0 resources.
+- **Background Image** [`login-bg.png`](static/images/login-bg.png) adapted from open-source github repo ['Login-Form'](https://github.com/bedimcode/login-form)
 - This project was created as part of a university group project for CITS3403.
 
 ---

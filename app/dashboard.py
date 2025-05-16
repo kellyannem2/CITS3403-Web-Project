@@ -44,7 +44,8 @@ def dashboard():
         if "submit_choose" in request.form:
             food_id = request.form.get("selected_food_id")
             fdc_id = request.form.get("fdc_id")
-            # Missing selection: neither local nor USDA ID
+
+            # Must pick something
             if not food_id and not fdc_id:
                 flash("Please pick a food from the search results.", "warning")
                 return redirect(url_for("dashboard"))
@@ -114,6 +115,7 @@ def dashboard():
             flash("Unknown action.", "error")
             return redirect(url_for("dashboard"))
 
+        # Log the meal
         new_log = MealLog(user_id=session["user_id"], food_id=food.id, date=meal_dt)
         db.session.add(new_log)
         db.session.commit()
@@ -121,18 +123,20 @@ def dashboard():
         flash(f"Logged “{food.name}” – {food.calories} cal @ {meal_dt}", "success")
         return redirect(url_for("dashboard"))
 
-    # GET request fallback
+    # — GET or after POST —
+
+    # 1) Authentication
     user_id = session.get("user_id")
     if not user_id:
         flash("Please log in first.", "error")
         return redirect(url_for("login"))
-
     user = User.query.get(user_id)
     if not user:
         session.pop("user_id", None)
         flash("User not found, please log in again.", "error")
         return redirect(url_for("login"))
 
+    # 2) Today's burned & eaten
     total_calories = db.session.query(
         func.sum(ExerciseLog.calories_burned)
     ).filter(
@@ -148,31 +152,16 @@ def dashboard():
     today_meals_user = [log for log in user.meal_logs if log.date == date.today()]
     total_eaten_user = sum(log.food.calories for log in today_meals_user if log.food)
 
-    scoreboard_entry = Scoreboard.query.filter_by(
-        user_id=user.id,
-        timestamp=date.today()
-    ).first()
-
-    if scoreboard_entry:
-        scoreboard_entry.total_calories_burned = total_calories
-    else:
-        db.session.add(Scoreboard(
-            user_id=user.id,
-            total_calories_burned=total_calories,
-            timestamp=date.today()
-        ))
-    db.session.commit()
-
+    # 3) Team scoreboard (unchanged)
     all_teams = db.session.query(User.team).filter(User.team.isnot(None)).distinct().all()
-    all_teams = [team[0] for team in all_teams]
-
+    all_teams = [t[0] for t in all_teams]
     team_member_scoreboard = []
     if user.team:
         team_users = User.query.filter_by(team=user.team).all()
         for teammate in team_users:
-            today_logs = [log for log in teammate.exercise_logs if log.date == date.today()]
-            today_meals = [log for log in teammate.meal_logs if log.date == date.today()]
-            if not today_logs or not today_meals:
+            ex_logs = [l for l in teammate.exercise_logs if l.date == date.today()]
+            meal_logs = [l for l in teammate.meal_logs if l.date == date.today()]
+            if not ex_logs or not meal_logs:
                 continue
             total_burned = db.session.query(func.sum(ExerciseLog.calories_burned)).filter(
                 ExerciseLog.user_id == teammate.id,
@@ -182,33 +171,38 @@ def dashboard():
                 MealLog.user_id == teammate.id,
                 MealLog.date == date.today()
             ).scalar() or 0
-            net = total_eaten - total_burned
             team_member_scoreboard.append({
                 "user": teammate,
                 "burned": total_burned,
                 "eaten": total_eaten,
-                "net": net
+                "net": total_eaten - total_burned
             })
         team_member_scoreboard.sort(key=lambda x: x["net"])
 
-    week_start = date.today() - timedelta(days=date.today().weekday())
-    weekly_results = db.session.query(
-        Scoreboard.timestamp,
-        func.sum(Scoreboard.total_calories_burned)
+    # 4) Weekly Calories Burned chart (ExerciseLog-based)
+    today = date.today()
+    week_start = today - timedelta(days=today.weekday())  # Monday
+
+    # Sum calories_burned per day in the week
+    burned_results = db.session.query(
+        ExerciseLog.date,
+        func.sum(ExerciseLog.calories_burned)
     ).filter(
-        Scoreboard.user_id == user.id,
-        Scoreboard.timestamp >= week_start,
-        Scoreboard.timestamp <= date.today()
-    ).group_by(Scoreboard.timestamp).all()
+        ExerciseLog.user_id == user.id,
+        ExerciseLog.date >= week_start,
+        ExerciseLog.date <= today
+    ).group_by(ExerciseLog.date).all()
 
-    week_data = {record[0].strftime('%a'): float(record[1]) for record in weekly_results}
+    # Map e.g. 'Mon' → total burned
+    week_map = { r[0].strftime('%a'): float(r[1]) for r in burned_results }
     labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    chart_data = [week_data.get(day, 0) for day in labels]
+    chart_data = [ week_map.get(d, 0) for d in labels ]
 
+    # 5) Render everything
     return render_template("index.html",
         user=user,
         form=form,
-        exercise=user.exercises,
+        exercise=todays_exercises,
         exercise_log=todays_exercises,
         meal_log=today_meals_user,
         total_eaten=total_eaten_user,

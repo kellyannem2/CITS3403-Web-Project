@@ -32,8 +32,8 @@
           {% for log in exercise_log %}
           <tr>
             <td>{{ log.exercise.name }}</td>
-            <td>{{ log.duration_minutes }} min</td>
-            <td>{{ log.calories_burned }}</td>
+            <td>{{ log.duration_minutes | round(0) }} min</td>
+            <td>{{ log.calories_burned | round(0) }}</td>
           </tr>
           {% else %}
           <tr><td colspan="3">No logs yet</td></tr>
@@ -42,7 +42,7 @@
       </table>
 
       <div class="total-summary">
-        <span>Total: {{ exercise_log | sum(attribute="calories_burned") | round(2) }} cal</span>
+        <span>Total: {{ exercise_log | sum(attribute="calories_burned") | round(0) }} cal</span>
       </div>
 
       <h3>Weekly Calories Burned</h3>
@@ -66,7 +66,7 @@
           {% for log in meal_log %}
           <tr>
             <td>{{ log.food.name }}</td>
-            <td>{{ log.food.calories }}</td>
+            <td>{{ log.food.calories | round(0) }}</td>
           </tr>
           {% else %}
           <tr><td colspan="2">No logs yet</td></tr>
@@ -75,7 +75,7 @@
       </table>
 
       <div class="total-summary">
-        <span>Total: {{ meal_log | sum(attribute="food.calories") | round(2) }} cal</span>
+        <span>Total: {{ meal_log | sum(attribute="food.calories") | round(0) }} cal</span>
       </div>
 
       <h3>Weekly Calorie Intake</h3>
@@ -91,7 +91,7 @@
 </main>
 
 <script>
-  const burnedData = {{ chart_data | tojson }};
+  const burnedData = {{ chart_data | tojson }}.map(v => Math.round(v));
   const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   // Calories Burned Chart
@@ -119,7 +119,7 @@
     .then(res => res.json())
     .then(data => {
       const intakeLabels = data.map(d => d.label);
-      const intakeValues = data.map(d => d.calories);
+      const intakeValues = data.map(d => Math.round(d.calories));
 
       if (intakeValues.every(v => v === 0)) {
         document.getElementById("noDataMsg").style.display = "block";

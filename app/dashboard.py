@@ -38,13 +38,16 @@ def dashboard():
             # Custom tab
             name = request.form.get("custom_name","").strip()
             cal  = request.form.get("custom_calories","").strip()
+            Food_user_id = session.get("user_id")
+            
             if not name or not cal.isdigit():
                 flash("Provide both a name (text) and calories (number).", "warning")
                 return redirect(url_for("dashboard"))
-
-            food = Food(name=name, calories=int(cal), serving_size="(custom)")
-            db.session.add(food)
-            db.session.flush()
+            check_if_exists = Food.query.filter(Food.name == name, Food.user_id == Food_user_id,Food.calories == int(cal)).first()
+            if not check_if_exists:
+                food = Food(name=name, calories=int(cal), serving_size="(custom)",user_id = Food_user_id)
+                db.session.add(food)
+                db.session.commit()
 
         else:
             flash("Unknown action.", "error")
@@ -106,20 +109,39 @@ def dashboard():
     all_teams = [team[0] for team in all_teams]
 
     # 🔹 Custom Team Leaderboard: Net Calories = Eaten - Burned
-    total_eaten = 0
     team_member_scoreboard = []
+
     if user.team:
         team_users = User.query.filter_by(team=user.team).all()
 
         for teammate in team_users:
+            # Filter logs for today
             today_logs = [log for log in teammate.exercise_logs if log.date == date.today()]
             today_meals = [log for log in teammate.meal_logs if log.date == date.today()]
 
             if not today_logs or not today_meals:
                 continue
 
-            total_burned = sum(log.calories_burned for log in today_logs)
-            total_eaten = sum(log.food.calories for log in today_meals)
+            total_burned = (
+                db.session.query(func.sum(ExerciseLog.calories_burned))
+                .filter(
+                    ExerciseLog.user_id == teammate.id,
+                    ExerciseLog.date == date.today()
+                )
+                .scalar()
+            ) or 0
+
+            total_eaten = (
+                db.session.query(func.sum(Food.calories))
+                .select_from(MealLog)
+                .join(Food, MealLog.food_id == Food.id)
+                .filter(
+                    MealLog.user_id == teammate.id,
+                    MealLog.date == date.today()
+                )
+                .scalar()
+            ) or 0
+
             net = total_eaten - total_burned
 
             team_member_scoreboard.append({
@@ -129,8 +151,11 @@ def dashboard():
                 "net": net
             })
 
-        team_member_scoreboard.sort(key=lambda x: x["net"])
 
+        team_member_scoreboard.sort(key=lambda x: x["net"])
+        
+    today_meals_user = [log for log in user.meal_logs if log.date == date.today()]
+    total_eaten_user = sum(log.food.calories for log in today_meals_user if log.food)
     # 🔹 Weekly calories burned chart
     today = date.today()
     week_start = today - timedelta(days=today.weekday())  # Monday
@@ -153,8 +178,8 @@ def dashboard():
         form=form,
         exercise=user.exercises,
         exercise_log=todays_exercises,
-        meal_log=today_meals,
-        total_eaten=total_eaten,
+        meal_log=today_meals_user,
+        total_eaten=total_eaten_user,
         scoreboard=team_member_scoreboard,
         user_total_calories_burnt=total_calories,
         chart_data=chart_data,
@@ -190,7 +215,7 @@ def calorie_counter():
             if not food_id:
                 flash("Please pick a food from the search results.", "warning")
                 return redirect(url_for("calorie_counter"))
-            food = Food.query.get(food_id)
+            food = Food.query.filter(Food.id == food_id,Food.user_id == session.get("user_id")).first()
             if not food:
                 flash("That food isn’t in our database—please search again.", "error")
                 return redirect(url_for("calorie_counter"))
@@ -198,12 +223,13 @@ def calorie_counter():
         elif "submit_custom" in request.form:
             name = request.form.get("custom_name", "").strip()
             cal  = request.form.get("custom_calories", "").strip()
+            food_user_id = session.get("user_id")
             if not name or not cal.isdigit():
                 flash("Provide both a name and calories.", "warning")
                 return redirect(url_for("calorie_counter"))
-            food = Food(name=name, calories=int(cal), serving_size="(custom)")
+            food = Food(name=name, calories=int(cal), serving_size="(custom)", user_id=food_user_id)
             db.session.add(food)
-            db.session.flush()
+            db.session.commit()
 
         else:
             flash("Unknown action.", "error")
@@ -285,6 +311,13 @@ def leaderboard():
 
     return render_template('leaderboard.html',
                            scoreboard=team_scoreboard)
+
+@app.route("/search_teams")
+def search_teams():
+    q = request.args.get("q", "").lower()
+    all_teams = [user.team for user in User.query.filter(User.team.isnot(None)).distinct()]
+    team_names = sorted(set([t for t in all_teams if t and q in t.lower()]))
+    return jsonify(team_names)
 
 
 @app.route('/refresh_scoreboard')
@@ -411,35 +444,45 @@ def foods_search():
     if len(q) < 2:
         return jsonify([])
 
-    # 1) Local DB search
-    local = (
+    user_id = session.get('user_id')
+
+    # 1) Shared (global) foods first
+    shared = (
         Food.query
-        .filter(Food.name.ilike(f"%{q}%"))
+        .filter(Food.name.ilike(f"%{q}%"), Food.user_id == None)
         .limit(10)
         .all()
     )
+
+    # 2) User-specific foods
+    user_custom = []
+    if user_id:
+        user_custom = (
+            Food.query
+            .filter(Food.name.ilike(f"%{q}%"), Food.user_id == user_id)
+            .limit(10)
+            .all()
+        )
+
+    combined = shared + user_custom
+
     results = [{
         'id':       f.id,
         'name':     f.name,
         'calories': f.calories,
-        'serving':  f.serving_size
-    } for f in local]
+        'serving':  f.serving_size,
+        'source':   'custom' if f.user_id else 'global'
+    } for f in combined]
 
-    # 2) Determine if we have a USDA key to use
+    # 3) Add USDA results if we have a key and fewer than 10 total so far
     api_key = None
-    # check per‐user key
-    user_id = session.get('user_id')
     if user_id:
         user = User.query.get(user_id)
         api_key = user.usda_api_key
-    # fallback to global
     if not api_key:
         api_key = current_app.config.get('FDC_API_KEY')
 
-    # 3) Only call USDA if we still want more AND we have a key
     if api_key and len(results) < 10:
-        # Temporarily inject the key into the USDA client
-        # (or modify search_foods to accept a key param)
         current_app.config['FDC_API_KEY'] = api_key
         usda_hits = search_foods(q, page_size=10 - len(results))
         for item in usda_hits:
@@ -452,7 +495,9 @@ def foods_search():
                 'fdcId':     item['fdcId'],
                 'name':      item['description'],
                 'calories':  calories,
-                'serving':   item.get('servingSizeUnit', '100 g')
+                'serving':   item.get('servingSizeUnit', '100 g'),
+                'source':    'usda'
             })
 
     return jsonify(results)
+

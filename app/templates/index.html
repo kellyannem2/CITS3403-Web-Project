@@ -35,13 +35,13 @@
         {% include 'partials/add_scoreboard_form.html' %}
         <div id="scoreboardModal" class="modal">
           <div class="modal-content">
-            <span id="closeScoreboardModal" class="close-btn">&times;</span>
+            <span id="closeScoreboardModal" class="close-btn" title="Add/Change Team">&times;</span>
             {% include 'partials/add_scoreboard_form.html' %}
           </div>
         </div>
         <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
       </div>
-      <p class="subheading">This Week's Scoreboard:</p>
+      <p class="subheading">This Week's Leaderboard:</p>
   
       <table>
         <thead>
@@ -64,7 +64,7 @@
 
       
       <br>
-      <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
+        <a href="{{ url_for('leaderboard') }}" class="btn-link">View More</a>
     </div>
 
     <!-- Exercise Log Column -->
@@ -74,7 +74,7 @@
         <div class="log-controls">
         {% include 'partials/add_exercise_form.html' %}
         <form method="POST" action="/delete_recent_exercise">
-          <button type="submit" class="btn-link">-</button>
+          <button type="submit" class="add-btn" title="Remove last exercise">-</button>
         </form>
         </div>
 
@@ -126,7 +126,7 @@
         <div class="log-controls">
         <button id="openMealModalBtn" class="add-btn" title="Add a Meal">+</button>
         <form method="POST" action="/delete_recent_meal">
-          <button type="submit" class="btn-link">-</button>
+          <button type="submit" class="add-btn" title="Remove last meal">-</button>
         </form>
         </div>
       </div>
@@ -151,6 +151,7 @@
       <div class="total-summary">
         Total: {{ total_eaten | round(0) }}
       </div>
+      <br>
       <h3>Weekly Calorie Intake</h3>
       <canvas id="calorieChart" width="400" height="200"></canvas>
       <p id="noDataMsg" style="display:none; text-align:center; color:gray;">No data for this week yet.</p>

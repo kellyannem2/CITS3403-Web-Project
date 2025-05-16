@@ -17,11 +17,14 @@ A fitness tracker web app for logging meals, tracking exercises, and sharing you
 - [License & References](#license--references)
 
 ---
-## Team Members:
-- Kelly-Anne McCabe 22976503
-- Ahamed Mohamed Fahim 23426094
-- Rowe O'Callaghan 23907299
-- Alan Williams 23361098
+## 👥 Team Members
+
+| Name               | Student ID | GitHub Username       |
+|--------------------|------------|------------------------|
+| Kelly-Anne McCabe | 22976503   | @kellyannem2           |
+| Ahamed Mohamed Fahim | 23426094 | @ahamedfahim246        |
+| Rowe O'Callaghan   | 23907299   | @roweoc10              |
+| Alan Williams      | 23361098   | @swimmingdiscount      |
 ---
 
 ## ✨ Features

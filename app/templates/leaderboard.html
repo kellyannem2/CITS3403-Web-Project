@@ -11,35 +11,38 @@
   {% include 'header.html' %}
 
   <main>
-    <h2>Leaderboard</h2>
-    <p class="subheading">This Week's Scoreboard: Team:</p>
+    <h1 style="text-align: center;">Leaderboard</h1>
+    <br>
+    <div class="column">
+      <p class="subheading">This Week's Leaderboard:</p>
 
-    <table id="leaderboard-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th data-key="username">Username</th>
-          <th data-key="net">Net Calories</th>
-          <th data-key="exercise">Exercise Calories</th>
-          <th data-key="food">Food Calories</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entry in scoreboard %}
-        <tr>
-          <td class="rank">{{ loop.index }}</td>
-          <td class="username">
-            <a href="{{ url_for('user_detail', user_id=entry.user.id) }}">
-              {{ entry.user.username }}
-            </a>
-          </td>
-          <td class="net">{{ entry.net | round(2) }}</td>
-          <td class="exercise">{{ entry.exercise_calories | round(2) }}</td>
-          <td class="food">{{ entry.food_calories | round(2) }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+      <table id="leaderboard-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th data-key="username">Username</th>
+            <th data-key="net">Net Calories</th>
+            <th data-key="exercise">Exercise Calories</th>
+            <th data-key="food">Food Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in scoreboard %}
+          <tr>
+            <td class="rank">{{ loop.index }}</td>
+            <td class="username">
+              <a href="{{ url_for('user_detail', user_id=entry.user.id) }}">
+                {{ entry.user.username }}
+              </a>
+            </td>
+            <td class="net">{{ entry.net | round(2) }}</td>
+            <td class="exercise">{{ entry.exercise_calories | round(2) }}</td>
+            <td class="food">{{ entry.food_calories | round(2) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </main>
 
   <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>

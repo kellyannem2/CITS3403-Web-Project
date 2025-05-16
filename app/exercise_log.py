@@ -144,25 +144,36 @@ def exercise_log_page():
     end_of_week = start_of_week + timedelta(days=6)
 
     # Logs in selected week
-    logs = ExerciseLog.query.filter(
-        ExerciseLog.user_id == user.id,
-        ExerciseLog.date >= start_of_week,
-        ExerciseLog.date <= end_of_week
-    ).order_by(ExerciseLog.date.desc()).all()
+    logs = (
+        ExerciseLog.query
+        .filter(
+            ExerciseLog.user_id == user.id,
+            ExerciseLog.date >= start_of_week,
+            ExerciseLog.date <= end_of_week
+        )
+        .order_by(ExerciseLog.date.desc())
+        .all()
+    )
 
-    # Weekly chart
-    weekly_results = db.session.query(
-        Scoreboard.timestamp,
-        func.sum(Scoreboard.total_calories_burned)
-    ).filter(
-        Scoreboard.user_id == user.id,
-        Scoreboard.timestamp >= start_of_week,
-        Scoreboard.timestamp <= end_of_week
-    ).group_by(Scoreboard.timestamp).all()
+    # Weekly chart: sum calories_burned per day
+    weekly_results = (
+        db.session.query(
+            ExerciseLog.date,
+            func.sum(ExerciseLog.calories_burned)
+        )
+        .filter(
+            ExerciseLog.user_id == user.id,
+            ExerciseLog.date >= start_of_week,
+            ExerciseLog.date <= end_of_week
+        )
+        .group_by(ExerciseLog.date)
+        .all()
+    )
 
-    week_data = {r[0].strftime('%a'): float(r[1]) for r in weekly_results}
+    # Map e.g. 'Mon' → total calories
+    week_data = { r[0].strftime('%a'): float(r[1]) for r in weekly_results }
     labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    chart_data = [week_data.get(day, 0) for day in labels]
+    chart_data = [ week_data.get(day, 0) for day in labels ]
 
     return render_template(
         'exercise_log.html',

@@ -45,7 +45,8 @@ class User(db.Model):
             _ENC_KEY,
             AesGcmEngine
         ),
-        nullable=True
+        nullable=True,
+        default="DEMO_KEY"
     )
 
     # Relationships
@@ -98,6 +99,7 @@ class Food(db.Model):
     name         = db.Column(db.String(128), nullable=False)
     calories     = db.Column(db.Float,      nullable=False)
     serving_size = db.Column(db.String(64), default='100 g')
+    fdc_id = db.Column(db.String(20), nullable=True, unique=True)
 
 class MealLog(db.Model):
     __tablename__ = "meal_log"

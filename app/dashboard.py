@@ -84,18 +84,32 @@ def dashboard():
                 return redirect(url_for("dashboard"))
 
         elif "submit_custom" in request.form:
-            name = request.form.get("custom_name", "").strip()
-            cal = request.form.get("custom_calories", "").strip()
+            name    = request.form.get("custom_name", "").strip()
+            cal_str = request.form.get("custom_calories", "").strip()
             user_id = session.get("user_id")
 
-            if not name or not cal.isdigit():
+            if not name or not cal_str.isdigit():
                 flash("Provide both a name (text) and calories (number).", "warning")
                 return redirect(url_for("dashboard"))
 
-            food = Food(name=name, calories=int(cal), serving_size="(custom)", user_id=user_id)
-            db.session.add(food)
-            db.session.commit()
+            calories_val = int(cal_str)
 
+            existing = Food.query.filter_by(
+                name=name,
+                calories=calories_val
+            ).first()
+
+            if existing:
+                food = existing
+            else:
+                food = Food(
+                    name=name,
+                    calories=calories_val,
+                    serving_size="(custom)",
+                    user_id=user_id
+                )
+                db.session.add(food)
+                db.session.commit()
         else:
             flash("Unknown action.", "error")
             return redirect(url_for("dashboard"))
@@ -250,15 +264,31 @@ def calorie_counter():
                 db.session.commit()
 
         elif "submit_custom" in request.form:
-            name = request.form.get("custom_name", "").strip()
-            cal  = request.form.get("custom_calories", "").strip()
-            if not name or not cal.isdigit():
+            name    = request.form.get("custom_name", "").strip()
+            cal_str = request.form.get("custom_calories", "").strip()
+
+            if not name or not cal_str.isdigit():
                 flash("Provide both a name and calories.", "warning")
                 return redirect(url_for("calorie_counter"))
-            food = Food(name=name, calories=int(cal), serving_size="(custom)", user_id=user_id)
-            db.session.add(food)
-            db.session.commit()
 
+            calories_val = int(cal_str)
+
+            existing = Food.query.filter_by(
+                name=name,
+                calories=calories_val
+            ).first()
+
+            if existing:
+                food = existing
+            else:
+                food = Food(
+                    name=name,
+                    calories=calories_val,
+                    serving_size="(custom)",
+                    user_id=user_id
+                )
+                db.session.add(food)
+                db.session.commit()
         else:
             flash("Unknown action.", "error")
             return redirect(url_for("calorie_counter"))
